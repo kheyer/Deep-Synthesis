@@ -28,3 +28,18 @@ def get_data_params(input_options, prediction_options):
         # returns single_predict (bool), source_filename (string to .txt filename)
         # target_filename (string to .txt filename if desired, else None)
         return single_predict, source_filename, target_filename
+
+def get_filenames(path='.'):
+    # Creates interface for user to select a file to load
+    # file must be stored locally in a directory accessable from the streamlit app
+    folder = st.text_input('Data Folder Path', path)
+    source_filename = file_selector(folder_path=folder, txt='Select source file')
+
+    if st.checkbox('Target File?'):
+        # optional check box for a file of targets (not required)
+        target_folder = st.text_input('Data Folder Path', folder)
+        target_filename = file_selector(folder_path=target_folder, txt='Select target file')
+    else:
+        target_filename = None
+
+    return source_filename, target_filename
