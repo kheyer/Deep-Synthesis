@@ -43,3 +43,10 @@ def get_filenames(path='.'):
         target_filename = None
 
     return source_filename, target_filename
+
+
+def file_selector(folder_path='.', txt='Select a file'):
+    # uses Streamlit string inputs to navigate to a file
+    filenames = os.listdir(folder_path)
+    selected_filename = st.selectbox(txt, filenames)
+    return os.path.join(folder_path, selected_filename)
