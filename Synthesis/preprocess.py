@@ -1,6 +1,48 @@
 from rdkit import Chem
 from rdkit.Chem import Draw
 
+class SmilesData():
+    def __init__(self, smiles, tokens, target=None, target_tokens=None):
+        self.smiles = smiles
+        self.smiles_tokens = tokens
+        self.target = target
+        self.target_tokens = None
+
+    @classmethod
+    def single_entry(cls, smiles, target=None):
+        smiles = preprocess(smiles)
+        smiles_tokens = tokenize(smiles)
+        if target:
+            target = [preprocess(target)]
+            target_tokens = [tokenize(target[0])]
+        else:
+            target_tokens = None
+        
+        return cls([smiles], [smiles_tokens], target, target_tokens)
+
+    @classmethod
+    def file_entry(cls, source_filename, target_filename=None):
+        smiles = list(open(source_filename))
+        
+        if target_filename:
+            target = list(open(target_filename))
+        else:
+            target = None
+        
+        return cls.list_entry(smiles, target)
+
+    @classmethod
+    def list_entry(cls, source_smiles, target_smiles=None):
+        smiles = [preprocess(i) for i in source_smiles]
+        smiles_tokens = [tokenize(i) for i in smiles]
+        
+        if target_smiles:
+            target = [preprocess(i) for i in target_smiles]
+            target_tokens = [tokenize(i) for i in target]
+        else:
+            target = None
+            target_tokens = None
+
 def preprocess(smiles):
     # Function to preprocess a single SMILES text string
 
