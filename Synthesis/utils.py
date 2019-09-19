@@ -2,6 +2,7 @@ import streamlit as st
 import os
 
 from preprocess import *
+from translate import *
 
 def app_setup():
     # starter values for prediction type 
@@ -75,3 +76,9 @@ def display_data(smile_data):
         st.image(smile_data.display(idx=display_idx, img_size=(300,300)))
     else:
         st.image(smile_data.display(img_size=(300,300)))
+
+@st.cache(ignore_hash=True)
+def translate_data(smile_data, beam, n_best, model_description):
+    Translation = TranslationModel(model_description)
+    scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
+    return scores
