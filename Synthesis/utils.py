@@ -117,3 +117,5 @@ def display_prediction(prediction):
 
     st.image(plot_topk([i.prediction_tokens for i in prediction_data],
                         [i.legend for i in prediction_data], img_size=(300,300)))
+
+    st.dataframe(prediction.sample_df(prediction_idx))

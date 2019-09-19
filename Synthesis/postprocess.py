@@ -81,6 +81,10 @@ class Predictions():
         self.score = (gb.Correct.mean() > 0).mean()
         print(self.score)
 
+    def sample_df(self, idx=0):
+        sample_df = self.df[self.df.ID == idx]
+        return sample_df
+
     def __len__(self):
         # length is the number of examples in the object
         return len(self.sources)
