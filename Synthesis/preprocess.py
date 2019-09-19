@@ -17,7 +17,7 @@ class SmilesData():
         smiles, smiles_tokens = process_and_tokenize(smiles)
         target, target_tokens = process_and_tokenize(target)
         # Items packaged into lists to be compatible with bulk methods
-        return cls([smiles], [smiles_tokens], [target], [target_tokens])
+        return cls(smiles, smiles_tokens, target, target_tokens)
 
     @classmethod
     def file_entry(cls, source_filename, target_filename=None):
@@ -42,10 +42,10 @@ class SmilesData():
         return cls(smiles, smiles_tokens, target, target_tokens)
 
 def process_and_tokenize(smiles):
-    if smiles is not None:
+    if smiles:
         if type(smiles) == str:
-            smiles = preprocess(smiles)
-            smiles_tokens = tokenize(smiles)
+            smiles = [preprocess(smiles)]
+            smiles_tokens = [tokenize(smiles[0])]
         else:
             smiles = [preprocess(i) for i in smiles]
             smiles_tokens = [tokenize(i) for i in smiles]
