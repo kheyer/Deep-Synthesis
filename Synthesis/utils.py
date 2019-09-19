@@ -64,3 +64,12 @@ def load_data(single_predict, source_param, target_param):
 
     # Returns a SilesData object
     return data 
+
+def display_data(smile_data):
+    # displays data held in a SmilesData object
+    if len(smile_data) > 1:
+        # If more than one SMILES is present, a streamlit slider bar is created
+        display_idx = st.slider('Display Index', 0, len(smile_data)-1, 0)
+        st.image(smile_data.display(idx=display_idx, img_size=(300,300)))
+    else:
+        st.image(smile_data.display(img_size=(300,300)))
