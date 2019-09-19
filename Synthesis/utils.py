@@ -1,5 +1,7 @@
 import streamlit as st 
 import os
+from rdkit import Chem
+from rdkit.Chem import Draw
 
 from preprocess import *
 from translate import *
@@ -85,6 +87,10 @@ def translate_data(smile_data, beam, n_best, model_description):
     prediction = Predictions(smile_data, preds, scores, attns)
     return prediction
 
+@st.cache
+def plot_topk(prediction_tokens, legend, img_size=(400,400)):
+    mols = [Chem.MolFromSmiles(process_prediction(i)) for i in prediction_tokens]
+    return Draw.MolsToGridImage(mols, legends=legend, subImgSize=img_size)
 
 def display_prediction(prediction):
     #if prediction:
@@ -108,3 +114,6 @@ def display_prediction(prediction):
     if im:
         st.image(im)
     st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
+
+    st.image(plot_topk([i.prediction_tokens for i in prediction_data],
+                        [i.legend for i in prediction_data], img_size=(300,300)))
