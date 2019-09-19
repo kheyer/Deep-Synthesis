@@ -55,6 +55,16 @@ class SmilesData():
 
         return Draw.MolsToGridImage(mol, molsPerRow=row, legends=legend, subImgSize=img_size)
 
+    def data_pair(self, idx):
+        # access a single example via index
+        if self.target:
+            return [self.smiles[idx], self.target[idx]]
+        else:
+            return [self.smiles[idx]]
+
+    def __repr__(self):
+        s = f'SmilesData object containing {len(self.smiles)} entries'
+
     def __len__(self):
         # __len__ is the number of SMILES in the class
         return len(self.smiles)
