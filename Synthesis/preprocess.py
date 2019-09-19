@@ -64,6 +64,7 @@ class SmilesData():
 
     def __repr__(self):
         s = f'SmilesData object containing {len(self.smiles)} entries'
+        return s
 
     def __len__(self):
         # __len__ is the number of SMILES in the class
