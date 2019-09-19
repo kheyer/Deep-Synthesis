@@ -1,6 +1,13 @@
 from rdkit import Chem
 from rdkit.Chem import Draw
 import pandas as pd
+import numpy as np
+from collections import namedtuple
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+PredictionTuple = namedtuple('Prediction', 
+                ['source_tokens', 'prediction_tokens', 'attention', 'legend'])
 
 class Predictions():
     '''
@@ -95,3 +102,71 @@ def process_prediction(smile, canonicalize=True):
         smile = ''
 
     return smile
+
+def display_parameters(prediction, idx=0):
+    # Gathers all data needed to visualize a specific prediction based on idx
+    # Returns source sequence tokens, prediction sequence tokens, attention arrays
+    # and legends for plotting
+
+    # Outputs are packaged into a named tuple 
+    prediction_tokens = prediction.preds[idx]
+    source_tokens = [prediction.source_tokens[idx] for _ in range(len(prediction_tokens))]
+    scores = prediction.scores[idx]
+    attentions = prediction.attns[idx]
+    
+    if prediction.do_target:
+        correct = list(prediction.df[prediction.df.ID == idx].Correct.values)
+        legend = [f'Prediction {i}, Probability {np.exp(score.item()):.4} ({corr})' 
+                  for i, (score, corr) in enumerate(zip(scores, correct))]
+    else:
+        legend = [f'Prediction {i}, Probability {np.exp(score.item()):.4}' 
+                  for i, score in enumerate(scores)]
+        
+    params = list(zip(source_tokens, prediction_tokens, attentions, legend))
+    params = [PredictionTuple(*i) for i in params]
+    return params
+
+def plot_prediction(source_tokens, prediction_tokens, attention, legend, img_size=(400,400)):
+    # Generated prediction plots 
+    # An RDKit image of the source and prediction molecules is generated
+    # Attention scores are plotted against source and prediction tokens
+    ### IMPORTANT attention plot must be generated with raw prediction tokens ###
+    # canonicalized predictions may be rearranged
+    source_mol = Chem.MolFromSmiles(process_prediction(source_tokens))
+    prediction_mol = Chem.MolFromSmiles(process_prediction(prediction_tokens))
+    legends = ['Source', legend]
+    
+    im = Draw.MolsToGridImage([source_mol, prediction_mol], legends=legends, subImgSize=img_size,
+                                 molsPerRow=2)
+    
+    attn_plot = plot_attention(source_tokens, prediction_tokens, attention)
+    
+    return im, attn_plot
+
+def plot_attention(source, target, attention):
+    # Creates a heatmap attention score plot based on source and target tokens
+    # Source and target must be tokenized space delimited strings
+    source_toks = source.split(' ')
+    target_toks = target.split(' ')
+
+    # Attention score is padded based on batch prediction
+    # We truncate to the relevant size based on source and target tokens
+    attention = attention[:len(target_toks), :len(source_toks)]
+    figsize = (attention.shape[1]//2, attention.shape[0]//2)
+    fig, ax1 = plt.subplots(figsize=figsize)
+
+    ax = sns.heatmap(attention, linewidths=0.01, ax=ax1, linecolor='black',
+                    xticklabels=source_toks, yticklabels=target_toks, square=True,
+                    cmap=sns.color_palette("YlGn", n_colors=15), 
+                    cbar_kws={"shrink": 0.5, 'pad':0.04, 'label': 'Attention Score'})
+
+    ax.set_xlabel('Source Tokens')
+    ax.set_ylabel('Target Tokens')
+
+    ax.tick_params(top=True, bottom=False,
+                labeltop=False, labelbottom=True)
+
+    for _, spine in ax.spines.items():
+        spine.set_visible(True)
+
+    return ax
