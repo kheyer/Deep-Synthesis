@@ -26,3 +26,5 @@ if st.checkbox('Load Data'):
         placeholder.text('Translation in Progress')
         prediction = translate_data(smile_data, beam, n_best, model_description)
         placeholder.text('Translation Complete')
+
+        display_prediction(prediction)
