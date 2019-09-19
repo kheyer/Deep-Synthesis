@@ -24,8 +24,8 @@ def get_data_params(input_options, prediction_options):
     if single_predict:
         # If single predict, create a text box for user input
         base_smile = 'O=Cc1cncc(Cl)c1COC1CCCCO1.OCc1c(Cl)cncc1Cl'
-        smile = st.text_input('Input Smile', base_smile)
-        target_smile = st.text_input('Known Target?' , '')
+        smile = st.text_input('Input Source SMILES (Required)', base_smile)
+        target_smile = st.text_input('Input Target SMILES (Optional)' , '')
         # returns single_predict (bool), smile (string), target_smile (string)
         return single_predict, smile, target_smile
     else:
@@ -101,7 +101,7 @@ def display_prediction(prediction):
 
     prediction_data = display_parameters(prediction, idx=prediction_idx)
 
-    view_idx = st.slider('View Prediction', 0, len(prediction_data)-1, 0)
+    view_idx = st.slider('View Prediction (In Order of Model Confidence)', 0, len(prediction_data)-1, 0)
 
     current_prediction = prediction_data[view_idx]
     im, attn_plot = plot_prediction(current_prediction.source_tokens,
@@ -118,4 +118,5 @@ def display_prediction(prediction):
     st.image(plot_topk([i.prediction_tokens for i in prediction_data],
                         [i.legend for i in prediction_data], img_size=(300,300)))
 
+    st.write('\nPrediction Dataframe')
     st.dataframe(prediction.sample_df(prediction_idx))
