@@ -9,4 +9,3 @@ future
 configargparse
 boto3
 pathlib
-os

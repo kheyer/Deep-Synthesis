@@ -7,6 +7,7 @@ Clone the repository
 
 Install packages with
 
+`cd Deep-Synthesis`
 `pip install -r requirements`
 
 Update `credentials.json` with appropriate AWS credentials
@@ -18,6 +19,9 @@ Download the model by running
 Clone fork of [OpenNMT](https://github.com/OpenNMT/OpenNMT-py)
 
 `git clone https://github.com/kheyer/OpenNMT-py`
+
+Start the app
+`streamlit run Synthesis/app.py`
 
 ## Requisites
 
