@@ -50,3 +50,17 @@ def file_selector(folder_path='.', txt='Select a file'):
     filenames = os.listdir(folder_path)
     selected_filename = st.selectbox(txt, filenames)
     return os.path.join(folder_path, selected_filename)
+
+@st.cache
+def load_data(single_predict, source_param, target_param):
+    # triggers actually loading the data
+    # loaded data is cached
+    if single_predict:
+        # If single_predict, load with the method for a single entry
+        data = SmilesData.single_entry(source_param, target_param)
+    else:
+        # Else, load from file
+        data = SmilesData.file_entry(source_param, target_param)
+
+    # Returns a SilesData object
+    return data 
