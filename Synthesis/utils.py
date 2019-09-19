@@ -84,3 +84,27 @@ def translate_data(smile_data, beam, n_best, model_description):
     scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
     prediction = Predictions(smile_data, preds, scores, attns)
     return prediction
+
+
+def display_prediction(prediction):
+    #if prediction:
+    if len(prediction) > 1:
+        prediction_idx = st.slider('Prediction Index', 0, len(prediction)-1, 0)
+    else:
+        prediction_idx = 0
+
+    prediction_data = display_parameters(prediction, idx=prediction_idx)
+
+    view_idx = st.slider('View Prediction', 0, len(prediction_data)-1, 0)
+
+    current_prediction = prediction_data[view_idx]
+    im, attn_plot = plot_prediction(current_prediction.source_tokens,
+                                    current_prediction.prediction_tokens,
+                                    current_prediction.attention,
+                                    current_prediction.legend,
+                                    img_size=(300,300))
+
+    st.write(f'Predicted Smile: {process_prediction(current_prediction.prediction_tokens)}')
+    if im:
+        st.image(im)
+    st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
