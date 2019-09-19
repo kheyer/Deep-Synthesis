@@ -3,6 +3,8 @@ from rdkit.Chem import Draw
 
 class SmilesData():
     def __init__(self, smiles, tokens, target=None, target_tokens=None):
+        # Class to hold SMILES data
+        # Holds source SMILES, tokenized sources, and optionally target SMILES / target tokens
         self.smiles = smiles
         self.smiles_tokens = tokens
         self.target = target
@@ -10,18 +12,17 @@ class SmilesData():
 
     @classmethod
     def single_entry(cls, smiles, target=None):
-        smiles = preprocess(smiles)
-        smiles_tokens = tokenize(smiles)
-        if target:
-            target = [preprocess(target)]
-            target_tokens = [tokenize(target[0])]
-        else:
-            target_tokens = None
-        
-        return cls([smiles], [smiles_tokens], target, target_tokens)
+        # Takes as input a single text string for sources and optionally targets
+        # Inputs are processed and tokenized
+        smiles, smiles_tokens = process_and_tokenize(smiles)
+        target, target_tokens = process_and_tokenize(target)
+        # Items packaged into lists to be compatible with bulk methods
+        return cls([smiles], [smiles_tokens], [target], [target_tokens])
 
     @classmethod
     def file_entry(cls, source_filename, target_filename=None):
+        # Takes as input file paths for files containing source / target SMILES
+        # SMILES are loaded as lists and passed to the list_entry method
         smiles = list(open(source_filename))
         
         if target_filename:
@@ -33,15 +34,27 @@ class SmilesData():
 
     @classmethod
     def list_entry(cls, source_smiles, target_smiles=None):
-        smiles = [preprocess(i) for i in source_smiles]
-        smiles_tokens = [tokenize(i) for i in smiles]
-        
-        if target_smiles:
-            target = [preprocess(i) for i in target_smiles]
-            target_tokens = [tokenize(i) for i in target]
+        # Takes as input lists of SMILES
+        # SMILES lists are processed and tokenized
+        smiles, smiles_tokens = process_and_tokenize(source_smiles)
+        target, target_tokens = process_and_tokenize(target_smiles)
+
+        return cls(smiles, smiles_tokens, target, target_tokens)
+
+def process_and_tokenize(smiles):
+    if smiles is not None:
+        if type(smiles) == str:
+            smiles = preprocess(smiles)
+            smiles_tokens = tokenize(smiles)
         else:
-            target = None
-            target_tokens = None
+            smiles = [preprocess(i) for i in smiles]
+            smiles_tokens = [tokenize(i) for i in smiles]
+    else:
+        smiles = None
+        smiles_tokens = None 
+    
+    return (smiles, smiles_tokens)
+
 
 def preprocess(smiles):
     # Function to preprocess a single SMILES text string
