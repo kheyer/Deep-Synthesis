@@ -41,6 +41,24 @@ class SmilesData():
 
         return cls(smiles, smiles_tokens, target, target_tokens)
 
+    def display(self, idx=0, img_size=(400,400)):
+        # Indexes into self.smiles with idx and displays an RDKit image of the SMILES 
+        # If targets are provided, target is also shown
+        mol = [Chem.MolFromSmiles(self.smiles[idx])]
+        row = 1
+        legend = [f'Source']
+        
+        if self.target:
+            mol += [Chem.MolFromSmiles(self.target[idx])]
+            row += 1   
+            legend += [f'Target']
+
+        return Draw.MolsToGridImage(mol, molsPerRow=row, legends=legend, subImgSize=img_size)
+
+    def __len__(self):
+        # __len__ is the number of SMILES in the class
+        return len(self.smiles)
+
 def process_and_tokenize(smiles):
     # handles both preprocessing and tokenizing for any input type
     if smiles:
