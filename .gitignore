@@ -111,3 +111,4 @@ dmypy.json
 
 # repo specific
 /OpenNMT-py/*
+/models/*
