@@ -12,3 +12,5 @@ pathlib
 streamlit
 pandas
 numpy
+seaborn
+matplotlib
