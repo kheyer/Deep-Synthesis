@@ -74,6 +74,11 @@ class Predictions():
         self.score = (gb.Correct.mean() > 0).mean()
         print(self.score)
 
+    def __len__(self):
+        # length is the number of examples in the object
+        return len(self.sources)
+
+
 def process_prediction(smile, canonicalize=True):
     # Processes predictions from a list of tokens to a SMILES string
     smile = ''.join(smile.split(' '))
