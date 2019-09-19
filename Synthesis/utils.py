@@ -1,6 +1,8 @@
 import streamlit as st 
 import os
 
+from preprocess import *
+
 def app_setup():
     # starter values for prediction type 
     input_options = ['Predict from String', 'Predict from File']
