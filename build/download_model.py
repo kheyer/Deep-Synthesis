@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import json
 
-credentials = json.load(open('../configs/credentials.json'))
+credentials = json.load(open('configs/credentials.json'))
 access_key = credentials['access_key']
 secret_key = credentials['secret_key']
 
