@@ -3,6 +3,7 @@ import os
 
 from preprocess import *
 from translate import *
+from postprocess import *
 
 def app_setup():
     # starter values for prediction type 
@@ -81,4 +82,5 @@ def display_data(smile_data):
 def translate_data(smile_data, beam, n_best, model_description):
     Translation = TranslationModel(model_description)
     scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
-    return scores
+    prediction = Predictions(smile_data, preds, scores, attns)
+    return prediction
