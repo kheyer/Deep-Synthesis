@@ -18,6 +18,7 @@ if st.checkbox('Load Data'):
 
     display_data(smile_data)
 
+    st.write('Input Prediction Parameters')
     beam = int(st.text_input('Beam Width', '10'))
     n_best = int(st.text_input('Top K Predictions', '5'))
 
