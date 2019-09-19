@@ -42,14 +42,20 @@ class SmilesData():
         return cls(smiles, smiles_tokens, target, target_tokens)
 
 def process_and_tokenize(smiles):
+    # handles both preprocessing and tokenizing for any input type
     if smiles:
+        # if string, single input
         if type(smiles) == str:
+            # outputs must be packaged into a list
             smiles = [preprocess(smiles)]
             smiles_tokens = [tokenize(smiles[0])]
         else:
+            # else, inputs will already be a list
             smiles = [preprocess(i) for i in smiles]
             smiles_tokens = [tokenize(i) for i in smiles]
     else:
+        # if input is none or an empty string, assign None
+        # handles optional target input
         smiles = None
         smiles_tokens = None 
     
