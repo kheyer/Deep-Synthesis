@@ -2,7 +2,6 @@ import streamlit as st
 import os
 from rdkit import Chem
 from rdkit.Chem import Draw
-from timeit import default_timer as timer
 import logging
 
 from preprocess import *
@@ -85,12 +84,8 @@ def display_data(smile_data):
 @st.cache(ignore_hash=True)
 def translate_data(smile_data, beam, n_best, model_description):
     Translation = TranslationModel(model_description)
-    start = timer()
     scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
-    end = timer()
     prediction = Predictions(smile_data, preds, scores, attns)
-    rate = (end - start) / len(prediction)
-    logging.warn(rate)
     return prediction
 
 @st.cache
@@ -106,6 +101,10 @@ def display_prediction(prediction):
         prediction_idx = 0
 
     prediction_data = display_parameters(prediction, idx=prediction_idx)
+
+    st.write(f'Top {prediction.top_k} Predictions')
+    st.image(plot_topk([i.prediction_tokens for i in prediction_data],
+                        [i.legend for i in prediction_data], img_size=(300,300)))
 
     if len(prediction_data) > 1:
         view_idx = st.slider('View Prediction (In Order of Model Confidence)', 0, len(prediction_data)-1, 0)
@@ -124,8 +123,8 @@ def display_prediction(prediction):
         st.image(im)
     st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
 
-    st.image(plot_topk([i.prediction_tokens for i in prediction_data],
-                        [i.legend for i in prediction_data], img_size=(300,300)))
+    # st.image(plot_topk([i.prediction_tokens for i in prediction_data],
+    #                     [i.legend for i in prediction_data], img_size=(300,300)))
 
     st.write('\nPrediction Dataframe')
     st.dataframe(prediction.sample_df(prediction_idx))
