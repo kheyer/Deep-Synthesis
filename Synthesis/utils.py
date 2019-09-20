@@ -2,6 +2,8 @@ import streamlit as st
 import os
 from rdkit import Chem
 from rdkit.Chem import Draw
+from timeit import default_timer as timer
+import logging
 
 from preprocess import *
 from translate import *
@@ -83,8 +85,12 @@ def display_data(smile_data):
 @st.cache(ignore_hash=True)
 def translate_data(smile_data, beam, n_best, model_description):
     Translation = TranslationModel(model_description)
+    start = timer()
     scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
+    end = timer()
     prediction = Predictions(smile_data, preds, scores, attns)
+    rate = (end - start) / len(prediction)
+    logging.warn(rate)
     return prediction
 
 @st.cache
@@ -101,7 +107,10 @@ def display_prediction(prediction):
 
     prediction_data = display_parameters(prediction, idx=prediction_idx)
 
-    view_idx = st.slider('View Prediction (In Order of Model Confidence)', 0, len(prediction_data)-1, 0)
+    if len(prediction_data) > 1:
+        view_idx = st.slider('View Prediction (In Order of Model Confidence)', 0, len(prediction_data)-1, 0)
+    else:
+        view_idx = 0
 
     current_prediction = prediction_data[view_idx]
     im, attn_plot = plot_prediction(current_prediction.source_tokens,
