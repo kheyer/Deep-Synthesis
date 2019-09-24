@@ -1,24 +1,20 @@
-from boto3.session import Session
 import boto3
-import os
+from botocore import UNSIGNED
+from botocore.client import Config
 from pathlib import Path
-import json
 
-credentials = json.load(open('configs/credentials.json'))
-access_key = credentials['access_key']
-secret_key = credentials['secret_key']
+s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 bucket_name = 'deepsynthesis'
-model_file = 'Molecular_transformer_step_400000.pt'
+model_file = 'public_models/Molecular_transformer_step_400000.pt'
+destination_file = 'models/Molecular_transformer_step_400000.pt'
 
 path = Path('.')
-file_path = path/'models'/model_file 
+file_path = path/destination_file 
 
 if not file_path.exists():
     print('Downloading Model File')
     (path/'models').mkdir(exist_ok=True)
-    session = Session(aws_access_key_id=access_key,
-                    aws_secret_access_key=secret_key)
-
-    s3 = session.resource('s3')
-    s3.Bucket(bucket_name).download_file(model_file, 'models/Molecular_transformer_step_400000.pt')
+    s3.download_file(bucket_name, model_file, destination_file)
+else:
+    print('Model already downloaded')
