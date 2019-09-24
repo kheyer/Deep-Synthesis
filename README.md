@@ -32,9 +32,13 @@ Once the Streamlit app is running locally, inference can be run on local hardwar
 
 Alternatively, the "Predict from File" option predicts in bulk from a text file containing multiple SMILES inputs. The inputs should be formatted with one set of reactants per line. See the example files in the `/data` directory. The "Predict from File" option expects the source file to be stored locally. The file path to the source file defaults to the `/data` directory, but can be pointed at any file path relative to the repo file.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/main_setup_branch/media/local_prediction_2.png" width="500" alt="local prediction from string">
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/main_setup_branch/media/local_prediction_2.png" width="500" alt="local prediction from file">
 
 For both prediction formats, known target product SMILES can optionally be provided. If target SMILES are provided, predictions are automatically scored.
+
+Once predictions are generated, they can be visualized using the slider bar. Source-to-prediction attention maps are also generated.
+
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/main_setup_branch/media/local_prediction_3.png" width="500" alt="local prediction evaluation">
 
 ## Requisites
 
