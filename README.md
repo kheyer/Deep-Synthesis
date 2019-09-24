@@ -1,37 +1,31 @@
 # Deep Synthesis
 A deep learning framework for predicting chemical synthesis
 
-## Setup
+## Local Setup
 
-Create a new conda environment and install RDKit
-
-`conda create -n deep_synthesis`
-
-`source activate deep_synthesis`
-
-`conda install rdkit -c rdkit`
+Follow these instructions to set up Deep Synthesis on your local machine
 
 Clone the repository
 
 `git clone https://github.com/kheyer/Deep-Synthesis`
 
-Install packages with
+Run `buildEnv.sh`. This shell script will create a conda environment named `deep_synthesis`, install all required packages and download the trained model
 
 `cd Deep-Synthesis`
-`pip install -r requirements.txt`
 
-Update `credentials.json` with appropriate AWS credentials
+`chmod +x buildEnv.sh`
 
-Download the model by running
+`./buildEnv.sh`
 
-`python build/download_model.py`
+Follow the package installation prompts.
 
-Clone fork of [OpenNMT](https://github.com/OpenNMT/OpenNMT-py)
+Once package installation is complete, activate the new conda environment and start the Streamlit app
 
-`git clone https://github.com/kheyer/OpenNMT-py`
+`source activate deep_synthesis`
 
-Start the app
 `streamlit run Synthesis/app.py`
+
+The Streamlit app is now running locally on port 8501
 
 ## Requisites
 
