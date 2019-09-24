@@ -4,6 +4,7 @@ sys.path.insert(0, 'OpenNMT-py')
 from onmt.utils.parse import ArgumentParser
 import onmt.opts as opts
 from onmt.translate.translator import build_translator
+import torch
 
 import types
 import io
@@ -28,6 +29,9 @@ class TranslationModel:
     '''
     def __init__(self, config):
         self.config = config
+        if torch.cuda.is_available():
+            self.config['opt']['gpu'] = 0
+
         # create OpenNMT opt object
         self.opt = self.configure_opt(config)
         

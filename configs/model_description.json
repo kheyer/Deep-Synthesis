@@ -2,7 +2,6 @@
     "id": 100,
     "model": "models/Molecular_transformer_step_400000.pt",
     "opt": {
-        "gpu" : 0,
         "beam_size": 10,
         "n_best" : 10,
         "batch_size" : 64,
