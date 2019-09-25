@@ -1,3 +1,4 @@
+import streamlit as st
 import sys 
 sys.path.insert(0, 'OpenNMT-py')
 
@@ -8,6 +9,7 @@ import torch
 
 import types
 import io
+from postprocess import *
 
 class TranslationModel:
     '''
@@ -136,3 +138,21 @@ class TranslationModel:
             bs = 64
             
         return bs
+
+@st.cache(ignore_hash=True)
+def translate_data(smile_data, beam, n_best, attention, model_description):
+    Translation = TranslationModel(model_description)
+    scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, 
+                                                beam=beam, n_best=n_best, return_attention=attention)
+    scores = process_scores(scores)
+    prediction = Predictions(smile_data, preds, scores, attns)
+    return prediction
+
+def process_scores(scores):
+    new_scores = []
+
+    for score_set in scores:
+        float_scores = [i.item() for i in score_set]
+        new_scores += [float_scores]
+    
+    return new_scores
