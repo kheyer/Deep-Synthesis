@@ -20,7 +20,7 @@ Follow the package installation prompts.
 Once package installation is complete, activate the new conda environment and start the Streamlit app
 
     source activate deep_synthesis
-    streamlit run Synthesis/app.py
+    streamlit run Synthesis/app.py local
 
 The Streamlit app is now running locally on port 8501
 
