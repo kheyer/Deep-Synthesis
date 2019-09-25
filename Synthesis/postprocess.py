@@ -156,16 +156,19 @@ def plot_attention(source, target, attention):
     # Attention score is padded based on batch prediction
     # We truncate to the relevant size based on source and target tokens
     attention = attention[:len(target_toks), :len(source_toks)]
-    figsize = (attention.shape[1]//2, attention.shape[0]//2)
+    figsize = (attention.shape[1]//3, attention.shape[0]//3)
     fig, ax1 = plt.subplots(figsize=figsize)
 
-    ax = sns.heatmap(attention, linewidths=0.01, ax=ax1, linecolor='black',
+    ax = sns.heatmap(attention, linewidths=0.1, ax=ax1, linecolor='black',
                     xticklabels=source_toks, yticklabels=target_toks, square=True,
                     cmap=sns.color_palette("YlGn", n_colors=15), 
                     cbar_kws={"shrink": 0.5, 'pad':0.04, 'label': 'Attention Score'})
 
     ax.set_xlabel('Source Tokens')
     ax.set_ylabel('Target Tokens')
+
+    loc, labels = plt.yticks()
+    ax.set_yticklabels(labels, rotation=360)
 
     ax.tick_params(top=True, bottom=False,
                 labeltop=False, labelbottom=True)
