@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Creates the Lambda function and API for the Translation inference application.
+
+Parameters: 
+  BucketName: 
+    Type: String
+    Default: somebucket
+    Description: Enter the name of the S3 bucket storing your Translation model artefacts.
+  ObjectKey: 
+    Type: String
+    Default: somekey
+    Description: Enter the S3 object key path of your Translation model artefacts.
+  LambdaLayerArn:
+    Type: String
+    Default: "arn:aws:lambda:us-west-2:791915736361:layer:opennmt-py:1"
+    Description: Lambda layer ARN with Pytorch/OpenNMT dependencies
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
+Globals:
+    Function:
+        Timeout: 120
+
+Resources:
+
+  TranslationFunction:
+      Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+      Properties:
+          CodeUri: translation_function/
+          Handler: app.lambda_handler
+          FunctionName : TranslationFunction
+          Runtime: python3.6
+          MemorySize: 2048
+          Environment:
+            Variables:
+              MODEL_BUCKET: !Ref BucketName
+              MODEL_KEY: !Ref ObjectKey
+          Policies:
+            - S3ReadPolicy:
+                BucketName: !Ref BucketName
+          Layers:
+            - !Ref LambdaLayerArn 
+          Events:
+              Translation:
+                  Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                  Properties:
+                      Path: /invocations
+                      Method: post
+                        
+Outputs:
+
+    # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+    # Find out more about other implicit resources you can reference within SAM
+    # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+    TranslationApi:
+      Description: "API Gateway endpoint URL for Prod stage for Translation function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/invocations/"
+
+    TranslationFunction:
+      Description: "Translation Lambda Function ARN"
+      Value: !GetAtt TranslationFunction.Arn
+
+    TranslationFunctionIamRole:
+      Description: "Implicit IAM Role created for Translation function"
+      Value: !GetAtt TranslationFunctionRole.Arn                        
