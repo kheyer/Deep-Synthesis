@@ -1,0 +1,13 @@
+{
+    "id": 100,
+    "model": "models/Molecular_transformer_step_400000.pt",
+    "opt": {
+        "beam_size": 10,
+        "n_best" : 10,
+        "batch_size" : 64,
+        "min_length" : 3,
+        "max_length" : 200,
+        "replace_unk" : true,
+        "verbose" : true
+    }
+}

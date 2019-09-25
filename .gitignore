@@ -71,6 +71,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb
 
 # IPython
 profile_default/
@@ -110,4 +111,6 @@ venv.bak/
 dmypy.json
 
 # repo specific
+/OpenNMT-py
 /OpenNMT-py/*
+/models/*
