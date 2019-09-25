@@ -19,8 +19,8 @@ if st.checkbox('Load Data'):
     display_data(smile_data)
 
     st.write('Input Prediction Parameters')
-    beam = int(st.text_input('Beam Width', '10'))
-    n_best = int(st.text_input('Top K Predictions', '5'))
+    beam = int(st.selectbox('Select Beam Width', [1,2,3,5]))
+    n_best = int(st.selectbox('Select Top K Predictions', [1,2,3,5]))
 
     if st.checkbox('Run Prediction'):
         placeholder = st.empty()
