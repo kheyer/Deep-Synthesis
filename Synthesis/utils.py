@@ -81,12 +81,12 @@ def display_data(smile_data):
     else:
         st.image(smile_data.display(img_size=(300,300)))
 
-@st.cache(ignore_hash=True)
-def translate_data(smile_data, beam, n_best, model_description):
-    Translation = TranslationModel(model_description)
-    scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
-    prediction = Predictions(smile_data, preds, scores, attns)
-    return prediction
+# @st.cache(ignore_hash=True)
+# def translate_data(smile_data, beam, n_best, model_description):
+#     Translation = TranslationModel(model_description)
+#     scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
+#     prediction = Predictions(smile_data, preds, scores, attns)
+#     return prediction
 
 @st.cache
 def plot_topk(prediction_tokens, legend, img_size=(400,400)):
