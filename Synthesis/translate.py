@@ -16,7 +16,6 @@ class TranslationModel:
 
     The config file should contain:
     Path to the model (string)
-    Device to load the model (GPU with number, or CPU) (int or string)
     Beam size (int)
     K best predictions (int)
     Minimum prediction length (int)
@@ -29,12 +28,17 @@ class TranslationModel:
     '''
     def __init__(self, config):
         self.config = config
+
+        # Configure GPU if available
         if torch.cuda.is_available():
             self.config['opt']['gpu'] = 0
+            self.gpu = True 
+        else:
+            self.gpu = False
 
         # create OpenNMT opt object
         self.opt = self.configure_opt(config)
-        
+
         # use opt to load model
         self.translator = self.load_translator(self.opt)
         self.base_beam = self.translator.beam_size
@@ -66,7 +70,7 @@ class TranslationModel:
 
         return translator
 
-    def run_translation(self, src, beam=None, n_best=None):
+    def run_translation(self, src, beam=None, n_best=None, return_attention=True):
         # Runs src through a loaded model and generates predictions
         # src should be a list of processed and tokenized SMILES
 
@@ -82,7 +86,7 @@ class TranslationModel:
         # beam size must be greater than or equal to the number of final predictions
         assert self.translator.beam_size >= self.translator.n_best
         
-        # sets batch size based on beam size
+        # sets batch size based on beam size and hardware (GPU or CPU)
         bs = self.get_batch_size(self.translator.beam_size)
 
         # outputs from translation
@@ -92,7 +96,10 @@ class TranslationModel:
         if beam or n_best:
             self.reset_params()
 
-        return (scores, preds, attns)
+        if return_attention:
+            return (scores, preds, attns)
+        else:
+            return (scores, preds)
 
     def reset_params(self):
         # reset beam_size and n_best parameters if desired
@@ -100,8 +107,25 @@ class TranslationModel:
         self.translator.n_best = self.base_best
     
     def get_batch_size(self, beam):
-        # sets batch size to predetermined values based on beam_size
-        # these values work well for a K80 GPU
+        # Calls correct batch size function based on CPU or GPU inference
+        if self.gpu:
+            bs =  self.get_batch_size_gpu(beam)
+        else:
+            bs = self.get_batch_size_cpu(beam)
+
+        return bs
+
+    def get_batch_size_cpu(self, beam):
+        # Optinum batch sizes for CPU inference
+        # based on AWS Lambda 2048 MB instance
+        if beam >= 10:
+            return 10
+        else:
+            return 15
+    
+    def get_batch_size_gpu(self, beam):
+        # Optimum batch sizes for GPU inference 
+        # Based off K80 GPU
         if beam == 1:
             bs = 256
         if beam >=2:
