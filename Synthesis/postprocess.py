@@ -58,7 +58,7 @@ class Predictions():
             
         for i in range(len(self.scores)):
             preds_flat += self.preds[i]
-            scores_flat += [score.item() for score in self.scores[i]]
+            scores_flat += [score for score in self.scores[i]]
             sources_flat += [self.sources[i] for j in range(len(self.scores[i]))]
             prediction_ids += [i for j in range(len(self.scores[i]))]
         
@@ -120,10 +120,10 @@ def display_parameters(prediction, idx=0):
     
     if prediction.do_target:
         correct = list(prediction.df[prediction.df.ID == idx].Correct.values)
-        legend = [f'Prediction {i}, Probability {np.exp(score.item()):.4} ({corr})' 
+        legend = [f'Prediction {i}, Probability {np.exp(score):.4} ({corr})' 
                   for i, (score, corr) in enumerate(zip(scores, correct))]
     else:
-        legend = [f'Prediction {i}, Probability {np.exp(score.item()):.4}' 
+        legend = [f'Prediction {i}, Probability {np.exp(score):.4}' 
                   for i, score in enumerate(scores)]
         
     params = list(zip(source_tokens, prediction_tokens, attentions, legend))
