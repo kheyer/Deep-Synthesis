@@ -28,38 +28,28 @@ class LambdaInterface():
     
     Currently, "fan_size" is set to be no more than 4
 
-    Once data is batched, running the "predict_async" function
+    Once data is batched, running the "run_translation" function
     will use the functions in the lambda_async.py file to 
     invoke all invocation_chunks simultaneously
     '''
-    def __init__(self, data, beam, n_best, attention, function, bucket):
-        self.data = data
-        self.beam = beam
-        self.n_best = n_best
-        self.attention = attention
-        self.function = function
-        self.bucket = bucket
+    def __init__(self, config):
+        self.function = config['function']
+        self.bucket = config['bucket']
         self.s3 = boto3.client('s3')
-                
+        self.fan_size = config['fan_size']
         self.chunksize_dict = {
                                 1 : 60,
                                 2 : 50,
                                 3 : 40,
                                 5 : 30
                               }
-
-        self.payload_size = self.chunksize_dict[beam]
-
-        # concurrent invocations will be up to 4
-        self.fan_size = min(4, math.ceil(len(data)/self.payload_size))
-        
         self.region = 'us-west-2'
         
     def chunk_data(self, data, chunksize):
         # partitions a list into chunks of size chunksize
         return [data[i:i+chunksize] for i in range(0, len(data), chunksize)]
     
-    def data_to_payload(self, data):
+    def data_to_payload(self, data, beam, n_best, attention, warmup=False):
         # writes a list of data payloads into a json format compatible
         # with the functions in lambda_async.py
         requests = []
@@ -69,9 +59,10 @@ class LambdaInterface():
             data_dict = {
                             "function_name" : self.function,
                             "payload" : {"data" : json.dumps(data_item),
-                                         "beam" : self.beam,
-                                         "n_best" : self.n_best,
-                                         "return_attention" : self.attention}
+                                         "beam" : beam,
+                                         "n_best" : n_best,
+                                         "return_attention" : attention,
+                                         "warmup" : warmup}
                         }
 
             requests.append(data_dict)
@@ -125,18 +116,21 @@ class LambdaInterface():
 
         return reconstructed_attentions
     
-    def predict_async(self):
+    def run_translation(self, data, beam, n_best, return_attention):
         # runs async prediction
 
+        payload_size = self.chunksize_dict[beam]
+        fan_size = min(self.fan_size, math.ceil(len(data)/payload_size))
+
         # break data into chunks of size payload_size
-        chunked_data = self.chunk_data(self.data, self.payload_size)
+        chunked_data = self.chunk_data(data, payload_size) #self.chunk_data(self.data, self.payload_size)
 
         # process payload chunks into json format
-        payload_chunks = self.data_to_payload(chunked_data)
+        payload_chunks = self.data_to_payload(chunked_data, beam, n_best, return_attention)
 
         # break payloads into invocation chunks
         # each chunk contains fan_size payload chunks
-        invocation_chunks = self.chunk_data(payload_chunks, self.fan_size)
+        invocation_chunks = self.chunk_data(payload_chunks, fan_size) #self.chunk_data(payload_chunks, self.fan_size)
         
         results = []
         # async prediction on each invocation chunk
@@ -146,16 +140,4 @@ class LambdaInterface():
         # reconstruct outputs
         predictions, scores, attentions = self.reconstruct_output(results)
         attentions = self.reconstruct_attention(attentions)
-        return predictions, scores, attentions
-
-
-@st.cache(ignore_hash=True)
-def translate_data(smile_data, beam, n_best, attention, model_description):
-    function = model_description['function']
-    bucket = model_description['bucket']
-    lambda_interface = LambdaInterface(smile_data.smiles_tokens, beam, n_best, attention, 
-                                        function, bucket)
-
-    preds, scores, attns = lambda_interface.predict_async()
-    prediction = Predictions(smile_data, preds, scores, attns)
-    return prediction
+        return scores, predictions, attentions
