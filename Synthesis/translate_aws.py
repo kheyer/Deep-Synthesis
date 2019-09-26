@@ -5,6 +5,7 @@ import json
 import pickle
 import gzip
 import numpy as np
+import base64
 
 from lambda_async import *
 from postprocess import *
@@ -70,20 +71,14 @@ class LambdaInterface():
         return requests
     
     def process_response(self, response):
-        # Due to the size of the response (mostly the attention maps)
-        # responses are not returned directly. They are stored in a s3 bucket
-        # as gzipped pickle files, and the item key is returned in the response
-        s3_key = response['body']['s3_key']
-        outputs = self.s3.get_object(Bucket=self.bucket, Key=s3_key)
-        output_dict = pickle.loads(gzip.decompress(outputs['Body'].read()))
-        
+        # Lambda response is converted to a json string, gzipped and base64 encoded.
+        # This function reconstructs the response by reversing that process
+        output_dict = json.loads(gzip.decompress(base64.b64decode(response['body'])))
+
         predictions = output_dict['predictions']
         scores = output_dict['scores']
         attention = output_dict['attention']
 
-        # delete item from bucket after it is retrieved 
-        self.s3.delete_object(Bucket=self.bucket, Key=s3_key)
-        
         return predictions, scores, attention
     
     def reconstruct_output(self, output):
