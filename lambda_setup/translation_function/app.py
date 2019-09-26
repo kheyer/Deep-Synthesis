@@ -7,9 +7,8 @@ The code here is based off a repo written by Matt McClean
 https://github.com/mattmcclean/sam-pytorch-example
 
 The lambda_handler function takes in an event as input,
-runs predictions on the content of the event, and stores the 
-outputs to an S3 bucket. The S3 key for the saved predictions
-is returned in a JSON response.
+runs predictions on the content of the event, and returns
+the predictions as a base64 encoded ascii string
 
 The input event should be structured as follows:
 
@@ -43,22 +42,15 @@ import numpy as np
 import pickle
 import pdb
 import gzip
-
 import os
+from io import BytesIO
+import base64
 
 from translate import *
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-# connect to S3 
-# Lambda function must be given S3 get/put permissions
-s3 = boto3.client('s3')
-
-# get bucket name from ENV variable
-MODEL_BUCKET=os.environ.get('MODEL_BUCKET')
-logger.info(f'Model Bucket is {MODEL_BUCKET}')
 
 # Load model config, load model from config
 model_description = json.load(open('model_config.json'))
@@ -75,16 +67,23 @@ def lambda_handler(event, context):
     if event['warmup']:
         response = {'warmup' : 'confirmed'}
     else:
-        response = run_translation(event, context)
+        response = run_translation(event)
 
     print("Returning response")
     return {
+        'isBase64Encoded': True,
         "statusCode": 200,
-        "body": response
+        'headers': {
+            'Content-Type': 'application/json',
+            'Content-Encoding': 'gzip',
+            'Access-Control-Allow-Origin': '*'
+        },
+        "body": gzip_b64encode(response)
     }
 
-def run_translation(event, context):
-    # processes event info, runs translation and saves output to S3
+
+def run_translation(event):
+    # processes event info, runs translation
     beam = event['beam']
     n_best = event['n_best']
     return_attention = event['return_attention']
@@ -92,16 +91,7 @@ def run_translation(event, context):
 
     print("Starting Prediction")
     predictions = predict(data, beam, n_best, return_attention)
-
-    # compress outputs to gzip format and store on S3
-    # this will throw an error if permissions are not added
-    gzip_filename = 'prediction_outputs/' + context.aws_request_id + '.gz'
-    gzip_object = gzip.compress(pickle.dumps(predictions))
-    s3.put_object(Body=gzip_object, Bucket=MODEL_BUCKET, Key=gzip_filename)
-
-    # send S3 key in response
-    response = {'s3_key' : gzip_filename}
-    return response
+    return predictions
 
 def predict(data, beam, n_best, return_attention):
     # function runs predictions and processes outputs
@@ -117,6 +107,13 @@ def predict(data, beam, n_best, return_attention):
     response['attention'] = process_attention(attns)
 
     return response
+
+def gzip_b64encode(data):
+    compressed = BytesIO()
+    with gzip.GzipFile(fileobj=compressed, mode='w') as f:
+        json_response = json.dumps(data)
+        f.write(json_response.encode('utf-8'))
+    return base64.b64encode(compressed.getvalue()).decode('ascii')
 
 def process_scores(scores):
     # scores are torch tensors, must be cast to float
