@@ -37,7 +37,7 @@ elif runtime == 'AWS':
 
     # Asyncronously ping fan_size instances concurrently
     # to prevent cold start
-    warmup_lambda(model_description['fan_size'])
+    warmup_lambda(model_description['fan_size'], model_description['function'])
 else:
     raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
                 'AWS' to run predictions on AWS (AWS inference requires permissions)''')
