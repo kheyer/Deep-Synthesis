@@ -69,11 +69,23 @@ Then we deploy to AWS CloudFormation
         --capabilities CAPABILITY_IAM \
         --parameter-overrides BucketName={BUCKET}
 
-Once creation is complete, the function is live and operational. There's just one more thing to do.
+Once creation is complete, the function is live and operational.
 
-When testing inference on AWS Lambda, I had issues with the message length limit on the response from the Lambda function. Trying to predict on a reasonable number of items and return all predictions, prediction scores and attention maps went way over the limit. To get around this, the function is designed to store all prediction outputs to S3 and return the S3 item key. To do this, the Lambda function must be given PUT permission for the S3 bucket in question.
+## Testing Locally
 
-To do this, go to the AWS IAM console. Go to `Policies`, `Create Policy`, and add the following as a JSON input.
+Once the function is set up, we can test the function locally. From the `/lambda_setup` directory, run the following.
+
+    sam local invoke TranslationFunction -n env.json -e event.json
+
+If everything is set up properly, this will run inference on the sample data in `event.json` and print prediction data to the console.
+
+## Addendum
+
+In a previous iteration of the lambda function, I ran into issues with the message length response limit for returning prediction values, particularly attention maps. Currently this is solved by compressing the response with gzip and sending it as a base64 encoded ascii string.
+
+Before I implemented the gzip/base64 solution, I created a workaround where I dumped the prediction values to an S3 bucket and sent the S3 object key in the response. To do this, the Lambda function needs special S3 permissions. While these permissions are not used in the current iteration, I think it's useful to keep them around in case further development requires that functionality.
+
+To give a Lambda function S3 access, go to the AWS IAM console. Go to `Policies`, `Create Policy`, and add the following as a JSON input.
 
     {
         "Version": "2012-10-17",
@@ -98,13 +110,3 @@ To do this, go to the AWS IAM console. Go to `Policies`, `Create Policy`, and ad
     }
 
 Then go to `Roles` and find the role associated with `{APP_NAME}`. Attach the new policy to the role.
-
-Now everything is ready to go.
-
-## Testing Locally
-
-Once the function is set up and has proper S3 permissions, we can test the function locally. From the `/lambda_setup` directory, run the following.
-
-    sam local invoke TranslationFunction -n env.json -e event.json
-
-If everything is set up properly, this will run inference on the sample data in `event.json`, print prediction data to the console, store prediction data on S3 and return a JSON response containing the S3 object key for the stored predictions.
