@@ -15,8 +15,10 @@ import json
 import os
 from typing import Dict, List
 import urllib
-
+import streamlit as st 
+import time
 import aiohttp
+import boto3
 from botocore import session, awsrequest, auth
 
 AWS_CREDENTIALS = session.Session().get_credentials()
@@ -88,3 +90,39 @@ def invoke_all(
     results = loop.run_until_complete(wrapper())
 
     return results
+
+
+def background(f):
+    from functools import wraps
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        if callable(f):
+            return loop.run_in_executor(None, f, *args, **kwargs)
+        else:
+            raise TypeError('Task must be a callable')    
+    return wrapped
+
+
+@background
+def warmup(payload):
+    client = boto3.client('lambda')
+    print('sending request')
+    client.invoke(FunctionName='TranslationFunction',
+                             InvocationType='RequestResponse',
+                             Payload=json.dumps(payload))
+    print("warmup completed")
+
+@st.cache
+def warmup_lambda(fan_size):
+    payload = { 'data': '""',
+                'beam': '',
+                'n_best': '',
+                'return_attention': '',
+                'warmup': True}
+    for i in range(fan_size):
+        print('starting warmup')
+        warmup(payload)
+        time.sleep(0.1)
+    return 'warmup complete'
