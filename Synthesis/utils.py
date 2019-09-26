@@ -3,10 +3,13 @@ import os
 from rdkit import Chem
 from rdkit.Chem import Draw
 import logging
+import time
 
 from preprocess import *
-from translate import *
 from postprocess import *
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def app_setup():
     # starter values for prediction type 
@@ -81,12 +84,17 @@ def display_data(smile_data):
     else:
         st.image(smile_data.display(img_size=(300,300)))
 
-# @st.cache(ignore_hash=True)
-# def translate_data(smile_data, beam, n_best, model_description):
-#     Translation = TranslationModel(model_description)
-#     scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, beam=beam, n_best=n_best)
-#     prediction = Predictions(smile_data, preds, scores, attns)
-#     return prediction
+@st.cache(ignore_hash=True)
+def translate_data(smile_data, beam, n_best, attention, translator_class, model_description):
+    # Important note: translator class must be instantiated within this function for 
+    # Streamlit caching to work properly
+    start = time.time()
+    translator = translator_class(model_description)
+    scores, preds, attns = translator.run_translation(smile_data.smiles_tokens, 
+                                                beam=beam, n_best=n_best, return_attention=attention)
+    logger.info(f'Inference Time: {time.time() - start}')
+    prediction = Predictions(smile_data, preds, scores, attns)
+    return prediction
 
 @st.cache
 def plot_topk(prediction_tokens, legend, img_size=(400,400)):
@@ -122,9 +130,6 @@ def display_prediction(prediction):
     if im:
         st.image(im)
     st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
-
-    # st.image(plot_topk([i.prediction_tokens for i in prediction_data],
-    #                     [i.legend for i in prediction_data], img_size=(300,300)))
 
     st.write('\nPrediction Dataframe')
     st.dataframe(prediction.sample_df(prediction_idx))
