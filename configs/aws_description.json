@@ -1,4 +1,5 @@
 {
     "function" : "TranslationFunction",
-    "bucket" : "deepsynthesis"
+    "bucket" : "deepsynthesis",
+    "fan_size" : 4
 }
