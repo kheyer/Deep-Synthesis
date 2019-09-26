@@ -4,6 +4,7 @@ import json
 from utils import *
 from preprocess import *
 from translate_aws import *
+from lambda_async import *
 
 # Importing translate also imports OpenNMT.
 # Putting this in a try/except block allows for deploying
@@ -33,6 +34,10 @@ if runtime == 'local':
     translator_class = TranslationModel
 elif runtime == 'AWS':
     translator_class = LambdaInterface
+
+    # Asyncronously ping fan_size instances concurrently
+    # to prevent cold start
+    warmup_lambda(model_description['fan_size'])
 else:
     raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
                 'AWS' to run predictions on AWS (AWS inference requires permissions)''')
