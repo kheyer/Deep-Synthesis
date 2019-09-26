@@ -38,10 +38,10 @@ class LambdaInterface():
         self.s3 = boto3.client('s3')
         self.fan_size = config['fan_size']
         self.chunksize_dict = {
-                                1 : 60,
-                                2 : 50,
-                                3 : 40,
-                                5 : 30
+                                1 : 100,
+                                2 : 80,
+                                3 : 60,
+                                5 : 50
                               }
         self.region = 'us-west-2'
         
@@ -119,8 +119,8 @@ class LambdaInterface():
     def run_translation(self, data, beam, n_best, return_attention):
         # runs async prediction
 
-        payload_size = self.chunksize_dict[beam]
-        fan_size = min(self.fan_size, math.ceil(len(data)/payload_size))
+        fan_size = self.fan_size
+        payload_size = min(self.chunksize_dict[beam], math.ceil(len(data)/fan_size))
 
         # break data into chunks of size payload_size
         chunked_data = self.chunk_data(data, payload_size) #self.chunk_data(self.data, self.payload_size)
