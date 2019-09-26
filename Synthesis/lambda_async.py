@@ -106,16 +106,16 @@ def background(f):
 
 
 @background
-def warmup(payload):
+def warmup(payload, function):
     client = boto3.client('lambda')
     print('sending request')
-    client.invoke(FunctionName='TranslationFunction',
+    client.invoke(FunctionName=function,
                              InvocationType='RequestResponse',
                              Payload=json.dumps(payload))
     print("warmup completed")
 
 @st.cache
-def warmup_lambda(fan_size):
+def warmup_lambda(fan_size, function):
     payload = { 'data': '""',
                 'beam': '',
                 'n_best': '',
@@ -123,6 +123,6 @@ def warmup_lambda(fan_size):
                 'warmup': True}
     for i in range(fan_size):
         print('starting warmup')
-        warmup(payload)
+        warmup(payload, function)
         time.sleep(0.1)
     return 'warmup complete'
