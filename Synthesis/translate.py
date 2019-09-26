@@ -94,6 +94,8 @@ class TranslationModel:
         # outputs from translation
         # all outputs are lists of lists
         scores, preds, attns = self.translator.translate(src, batch_size=bs, return_attention=True)
+
+        scores = process_scores(scores)
         
         if beam or n_best:
             self.reset_params()
@@ -119,7 +121,7 @@ class TranslationModel:
 
     def get_batch_size_cpu(self, beam):
         # Optinum batch sizes for CPU inference
-        # based on AWS Lambda 2048 MB instance
+        # based on AWS Lambda 3008 MB instance
         if beam >= 10:
             return 10
         else:
@@ -138,15 +140,6 @@ class TranslationModel:
             bs = 64
             
         return bs
-
-@st.cache(ignore_hash=True)
-def translate_data(smile_data, beam, n_best, attention, model_description):
-    Translation = TranslationModel(model_description)
-    scores, preds, attns = Translation.run_translation(smile_data.smiles_tokens, 
-                                                beam=beam, n_best=n_best, return_attention=attention)
-    scores = process_scores(scores)
-    prediction = Predictions(smile_data, preds, scores, attns)
-    return prediction
 
 def process_scores(scores):
     new_scores = []
