@@ -17,7 +17,8 @@ The input event should be structured as follows:
     "beam" : int,
     "n_best" : int
     "return_attention" : bool
-    "data" : Tokenized SMILES data dumped to a JSON string
+    "data" : Tokenized SMILES data dumped to a JSON string,
+    "warmup" : bool
 }
 
 This function is designed to import dependencies from a Lambda layer.
@@ -70,7 +71,20 @@ def lambda_handler(event, context):
     print("Starting event")
     logger.info(event)
 
-    # extract info from event/context
+    # allow ping for warmup
+    if event['warmup']:
+        response = {'warmup' : 'confirmed'}
+    else:
+        response = run_translation(event)
+
+    print("Returning response")
+    return {
+        "statusCode": 200,
+        "body": response
+    }
+
+def run_translation(event):
+    # processes event info, runs translation and saves output to S3
     beam = event['beam']
     n_best = event['n_best']
     return_attention = event['return_attention']
@@ -78,7 +92,6 @@ def lambda_handler(event, context):
     event_id = context.aws_request_id
 
     print("Starting Prediction")
-    # run prediction
     predictions = predict(data, beam, n_best, return_attention)
 
     # compress outputs to gzip format and store on S3
@@ -89,11 +102,7 @@ def lambda_handler(event, context):
 
     # send S3 key in response
     response = {'s3_key' : gzip_filename}
-    print("Returning response")
-    return {
-        "statusCode": 200,
-        "body": response
-    }
+    return response
 
 def predict(data, beam, n_best, return_attention):
     # function runs predictions and processes outputs
