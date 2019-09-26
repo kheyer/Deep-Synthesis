@@ -13,7 +13,7 @@ Parameters:
     Description: Enter the S3 object key path of your Translation model artefacts.
   LambdaLayerArn:
     Type: String
-    Default: "arn:aws:lambda:us-west-2:791915736361:layer:opennmt-py:1"
+    Default: "arn:aws:lambda:us-west-2:791915736361:layer:opennmt-py:2"
     Description: Lambda layer ARN with Pytorch/OpenNMT dependencies
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
@@ -31,7 +31,7 @@ Resources:
           Handler: app.lambda_handler
           FunctionName : TranslationFunction
           Runtime: python3.6
-          MemorySize: 2048
+          MemorySize: 3008
           Environment:
             Variables:
               MODEL_BUCKET: !Ref BucketName
