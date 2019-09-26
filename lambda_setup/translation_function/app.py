@@ -75,7 +75,7 @@ def lambda_handler(event, context):
     if event['warmup']:
         response = {'warmup' : 'confirmed'}
     else:
-        response = run_translation(event)
+        response = run_translation(event, context)
 
     print("Returning response")
     return {
@@ -83,13 +83,12 @@ def lambda_handler(event, context):
         "body": response
     }
 
-def run_translation(event):
+def run_translation(event, context):
     # processes event info, runs translation and saves output to S3
     beam = event['beam']
     n_best = event['n_best']
     return_attention = event['return_attention']
     data = json.loads(event['data'])
-    event_id = context.aws_request_id
 
     print("Starting Prediction")
     predictions = predict(data, beam, n_best, return_attention)
