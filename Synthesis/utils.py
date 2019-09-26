@@ -92,8 +92,9 @@ def translate_data(smile_data, beam, n_best, attention, translator_class, model_
     translator = translator_class(model_description)
     scores, preds, attns = translator.run_translation(smile_data.smiles_tokens, 
                                                 beam=beam, n_best=n_best, return_attention=attention)
-    logger.info(f'Inference Time: {time.time() - start}')
+    prediction_time = time.time() - start
     prediction = Predictions(smile_data, preds, scores, attns)
+    logger.info(f'Inference Time: {prediction_time}')
     return prediction
 
 @st.cache
