@@ -28,6 +28,7 @@ find . -type d -name "tests" -exec rm -rf {} +
 find . -type d -name "__pycache__" -exec rm -rf {} +
 rm -rf ./{caffe2,wheel,pkg_resources,boto*,aws*,pip,pipenv,setuptools} 
 rm ./torch/lib/libtorch.so 
+rm -rf ./torch/test
 rm -rf ./{*.egg-info,*.dist-info} 
 find . -name \*.pyc -delete
 rm {app.py,requirements.txt,model_config.json,translate.py} 
