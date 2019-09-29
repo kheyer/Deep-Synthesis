@@ -13,5 +13,5 @@ streamlit
 pandas
 numpy
 seaborn
-matplotlib
+matplotlib==3.0.0
 aiohttp
