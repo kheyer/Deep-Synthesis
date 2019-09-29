@@ -24,6 +24,22 @@ Once package installation is complete, activate the new conda environment and st
 
 The Streamlit app is now running locally on port 8501
 
+## Local Docker Setup
+
+To build a Docker container running the application locally, run the following:
+
+Clone the repository
+
+    git clone https://github.com/kheyer/Deep-Synthesis
+    
+Build the container
+
+    docker build -f build/local.Dockerfile -t deep_synthesis .
+    docker run -p 8501:8501 deep_synthesis
+
+The Streamlit app is now running locally on port 8501
+
+
 ## Local Inference
 
 Once the Streamlit app is running locally, inference can be run on local hardware. There are two ways to run inference. The "Predict from String" option predicts on a single SMILES string entered into the text entry box.
