@@ -130,4 +130,4 @@ def display_prediction(prediction, display_idx):
     st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
 
     st.write('\nPrediction Dataframe')
-    st.dataframe(prediction.sample_df(prediction_idx))
+    st.dataframe(prediction.sample_df(display_idx))
