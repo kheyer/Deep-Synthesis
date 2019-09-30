@@ -75,14 +75,17 @@ def load_data(single_predict, source_param, target_param):
     # Returns a SilesData object
     return data 
 
-def display_data(smile_data):
+def display_data(smile_data, display_idx):
     # displays data held in a SmilesData object
-    if len(smile_data) > 1:
-        # If more than one SMILES is present, a streamlit slider bar is created
-        display_idx = st.slider('Display Index', 0, len(smile_data)-1, 0)
-        st.image(smile_data.display(idx=display_idx, img_size=(300,300)))
+    return st.image(smile_data.display(idx=display_idx, img_size=(300,300)))
+
+def display_slider(data):
+    if len(data) > 1:
+        display_idx = st.sidebar.slider('Display Index', 0, len(data)-1, 0)
     else:
-        st.image(smile_data.display(img_size=(300,300)))
+        display_idx = 0
+    
+    return display_idx
 
 @st.cache(ignore_hash=True)
 def translate_data(smile_data, beam, n_best, attention, translator_class, model_description):
@@ -102,14 +105,8 @@ def plot_topk(prediction_tokens, legend, img_size=(400,400)):
     mols = [Chem.MolFromSmiles(process_prediction(i)) for i in prediction_tokens]
     return Draw.MolsToGridImage(mols, legends=legend, subImgSize=img_size)
 
-def display_prediction(prediction):
-    #if prediction:
-    if len(prediction) > 1:
-        prediction_idx = st.slider('Prediction Index', 0, len(prediction)-1, 0)
-    else:
-        prediction_idx = 0
-
-    prediction_data = display_parameters(prediction, idx=prediction_idx)
+def display_prediction(prediction, display_idx):
+    prediction_data = display_parameters(prediction, idx=display_idx)
 
     st.write(f'Top {prediction.top_k} Predictions')
     st.image(plot_topk([i.prediction_tokens for i in prediction_data],
