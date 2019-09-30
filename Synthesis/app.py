@@ -38,6 +38,7 @@ elif runtime == 'AWS':
     # Asyncronously ping fan_size instances concurrently
     # to prevent cold start
     warmup_lambda(model_description['fan_size'], model_description['function'])
+    
 else:
     raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
                 'AWS' to run predictions on AWS (AWS inference requires permissions)''')
@@ -51,19 +52,24 @@ prediction_option = st.selectbox('Select an Input Format', input_options)
 
 single_predict, source_param, target_param = get_data_params(input_options, prediction_option)
 
-if st.checkbox('Load Data'):
-    smile_data = load_data(single_predict, source_param, target_param)
+data_box = st.checkbox('Load Data')
 
-    display_data(smile_data)
+if data_box:
+    smile_data = load_data(single_predict, source_param, target_param)
+    display_idx = display_slider(smile_data)
+
+    display_data(smile_data, display_idx)
 
     st.write('Input Prediction Parameters')
     beam = int(st.selectbox('Select Beam Width', [1,2,3,5]))
     n_best = int(st.selectbox('Select Top K Predictions', [1,2,3,5]))
 
-    if st.checkbox('Run Prediction'):
+    prediction_box = st.checkbox('Run Prediction')
+
+    if prediction_box:
         placeholder = st.empty()
         placeholder.text('Translation in Progress')
         prediction = translate_data(smile_data, beam, n_best, True, translator_class, model_description)
         placeholder.text('Translation Complete')
 
-        display_prediction(prediction)
+        display_prediction(prediction, display_idx)
