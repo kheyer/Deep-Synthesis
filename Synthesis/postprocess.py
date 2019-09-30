@@ -58,7 +58,7 @@ class Predictions():
             
         for i in range(len(self.scores)):
             preds_flat += self.preds[i]
-            scores_flat += [score.item() for score in self.scores[i]]
+            scores_flat += [score for score in self.scores[i]]
             sources_flat += [self.sources[i] for j in range(len(self.scores[i]))]
             prediction_ids += [i for j in range(len(self.scores[i]))]
         
@@ -120,10 +120,10 @@ def display_parameters(prediction, idx=0):
     
     if prediction.do_target:
         correct = list(prediction.df[prediction.df.ID == idx].Correct.values)
-        legend = [f'Prediction {i}, Probability {np.exp(score.item()):.4} ({corr})' 
+        legend = [f'Prediction {i}, Probability {np.exp(score):.4} ({corr})' 
                   for i, (score, corr) in enumerate(zip(scores, correct))]
     else:
-        legend = [f'Prediction {i}, Probability {np.exp(score.item()):.4}' 
+        legend = [f'Prediction {i}, Probability {np.exp(score):.4}' 
                   for i, score in enumerate(scores)]
         
     params = list(zip(source_tokens, prediction_tokens, attentions, legend))
@@ -156,16 +156,19 @@ def plot_attention(source, target, attention):
     # Attention score is padded based on batch prediction
     # We truncate to the relevant size based on source and target tokens
     attention = attention[:len(target_toks), :len(source_toks)]
-    figsize = (attention.shape[1]//2, attention.shape[0]//2)
+    figsize = (attention.shape[1]//3, attention.shape[0]//3)
     fig, ax1 = plt.subplots(figsize=figsize)
 
-    ax = sns.heatmap(attention, linewidths=0.01, ax=ax1, linecolor='black',
+    ax = sns.heatmap(attention, linewidths=0.1, ax=ax1, linecolor='black',
                     xticklabels=source_toks, yticklabels=target_toks, square=True,
                     cmap=sns.color_palette("YlGn", n_colors=15), 
                     cbar_kws={"shrink": 0.5, 'pad':0.04, 'label': 'Attention Score'})
 
     ax.set_xlabel('Source Tokens')
     ax.set_ylabel('Target Tokens')
+
+    loc, labels = plt.yticks()
+    ax.set_yticklabels(labels, rotation=360)
 
     ax.tick_params(top=True, bottom=False,
                 labeltop=False, labelbottom=True)

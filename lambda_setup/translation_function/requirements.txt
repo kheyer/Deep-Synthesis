@@ -1,0 +1,8 @@
+numpy==1.11.3
+https://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+requests
+six
+git+https://github.com/pytorch/text.git@master#wheel=torchtext
+git+https://github.com/kheyer/OpenNMT-py
+future
+configargparse

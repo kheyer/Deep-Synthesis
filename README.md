@@ -20,9 +20,25 @@ Follow the package installation prompts.
 Once package installation is complete, activate the new conda environment and start the Streamlit app
 
     source activate deep_synthesis
-    streamlit run Synthesis/app.py
+    streamlit run Synthesis/app.py local
 
 The Streamlit app is now running locally on port 8501
+
+## Local Docker Setup
+
+To build a Docker container running the application locally, run the following:
+
+Clone the repository
+
+    git clone https://github.com/kheyer/Deep-Synthesis
+    
+Build the container
+
+    docker build -f build/local.Dockerfile -t deep_synthesis .
+    docker run -p 8501:8501 deep_synthesis
+
+The Streamlit app is now running locally on port 8501
+
 
 ## Local Inference
 

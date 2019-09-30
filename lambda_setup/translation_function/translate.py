@@ -1,7 +1,3 @@
-import streamlit as st
-import sys 
-sys.path.insert(0, 'OpenNMT-py')
-
 from onmt.utils.parse import ArgumentParser
 import onmt.opts as opts
 from onmt.translate.translator import build_translator
@@ -9,7 +5,7 @@ import torch
 
 import types
 import io
-from postprocess import *
+
 
 class TranslationModel:
     '''
@@ -94,8 +90,6 @@ class TranslationModel:
         # outputs from translation
         # all outputs are lists of lists
         scores, preds, attns = self.translator.translate(src, batch_size=bs, return_attention=True)
-
-        scores = process_scores(scores)
         
         if beam or n_best:
             self.reset_params()
@@ -109,7 +103,7 @@ class TranslationModel:
         # reset beam_size and n_best parameters if desired
         self.translator.beam_size = self.base_beam
         self.translator.n_best = self.base_best
-    
+
     def get_batch_size(self, beam):
         # Calls correct batch size function based on CPU or GPU inference
         if self.gpu:
@@ -121,7 +115,7 @@ class TranslationModel:
 
     def get_batch_size_cpu(self, beam):
         # Optinum batch sizes for CPU inference
-        # based on AWS Lambda 3008 MB instance
+        # based on AWS Lambda 2048 MB instance
         if beam >= 10:
             return 10
         else:
@@ -140,12 +134,3 @@ class TranslationModel:
             bs = 64
             
         return bs
-
-def process_scores(scores):
-    new_scores = []
-
-    for score_set in scores:
-        float_scores = [i.item() for i in score_set]
-        new_scores += [float_scores]
-    
-    return new_scores
