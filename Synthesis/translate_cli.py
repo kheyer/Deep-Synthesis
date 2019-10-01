@@ -16,9 +16,9 @@ except ModuleNotFoundError:
 
 # define arg specifications on launch
 parser = argparse.ArgumentParser()
-parser.add_argument("runtime", help="Argument to select local or AWS runtimes ['local' or 'AWS']")
-parser.add_argument("source_file", help="Path to source file for translation")
-parser.add_argument("destination_file", help="Path to destination file to save translations (CSV file)")
+parser.add_argument("--runtime", help="Argument to select local or AWS runtimes ['local' or 'AWS']")
+parser.add_argument("--source_file", help="Path to source file for translation")
+parser.add_argument("--destination_file", help="Path to destination file to save translations (CSV file)")
 parser.add_argument("--target_file", help="Path to file of known targets (optional)", default=None)
 parser.add_argument("--beam", help="Beam search width", default=5)
 parser.add_argument("--n_best", help="Top k results", default=5)
