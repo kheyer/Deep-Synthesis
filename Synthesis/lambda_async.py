@@ -107,7 +107,7 @@ def background(f):
 
 @background
 def warmup(payload, function):
-    client = boto3.client('lambda')
+    client = boto3.client('lambda', 'us-west-2')
     print('sending request')
     client.invoke(FunctionName=function,
                              InvocationType='RequestResponse',
