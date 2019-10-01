@@ -103,11 +103,14 @@ class LambdaInterface():
     def reconstruct_attention(self, attns):
         # Attention maps are loaded as lists of lists.
         # This function reconstructs them into numpy arrays
-        reconstructed_attentions = []
+        if attns[0] is not None:
+            reconstructed_attentions = []
 
-        for attention_set in attns:
-            array_attentions = [np.array(i) for i in attention_set]
-            reconstructed_attentions += [array_attentions]
+            for attention_set in attns:
+                array_attentions = [np.array(i) for i in attention_set]
+                reconstructed_attentions += [array_attentions]
+        else:
+            reconstructed_attentions = attns
 
         return reconstructed_attentions
     
