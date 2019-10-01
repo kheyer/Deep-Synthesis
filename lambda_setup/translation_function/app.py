@@ -104,7 +104,10 @@ def predict(data, beam, n_best, return_attention):
     response = {}
     response['predictions'] = preds 
     response['scores'] = process_scores(scores)
-    response['attention'] = process_attention(attns)
+    if return_attention:
+        response['attention'] = process_attention(attns)
+    else:
+        response['attention'] = [None]
 
     return response
 
