@@ -9,8 +9,8 @@ from pathlib import Path
 s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 bucket_name = 'deepsynthesis'
-model_file = 'public_models/Molecular_transformer_step_400000.pt'
-destination_file = 'translation_function/Molecular_transformer_step_400000.pt'
+model_file = 'public_models/deep_synthesis.pt'
+destination_file = 'translation_function/deep_synthesis.pt'
 
 path = Path('.')
 file_path = path/destination_file 
