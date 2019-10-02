@@ -156,7 +156,7 @@ def plot_attention(source, target, attention):
     # Attention score is padded based on batch prediction
     # We truncate to the relevant size based on source and target tokens
     attention = attention[:len(target_toks), :len(source_toks)]
-    figsize = (attention.shape[1]//3, attention.shape[0]//3)
+    figsize = (attention.shape[1]//4, attention.shape[0]//4)
     fig, ax1 = plt.subplots(figsize=figsize)
 
     ax = sns.heatmap(attention, linewidths=0.1, ax=ax1, linecolor='black',
