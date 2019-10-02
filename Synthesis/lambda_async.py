@@ -114,6 +114,7 @@ def warmup(payload, function):
                              Payload=json.dumps(payload))
     print("warmup completed")
 
+@st.cache 
 def warmup_lambda(fan_size, function):
     payload = { 'data': '""',
                 'beam': '',
