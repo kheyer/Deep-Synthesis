@@ -9,6 +9,7 @@ RUN git clone https://github.com/kheyer/Deep-Synthesis
 
 RUN mkdir -p /root/.streamlit
 
+# Streamlit requires something under email in the credentials file
 RUN bash -c 'echo -e "\
 [general]\n\
 email = \"\"\n\

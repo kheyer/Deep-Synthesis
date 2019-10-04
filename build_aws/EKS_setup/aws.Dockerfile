@@ -9,11 +9,14 @@ RUN git clone -b training https://github.com/kheyer/Deep-Synthesis
 
 RUN mkdir -p /root/.streamlit
 
+# Streamlit requires something under email in the credentials file
 RUN bash -c 'echo -e "\
 [general]\n\
 email = \"\"\n\
 " > /root/.streamlit/credentials.toml'
 
+# CORS currently prevents AWS Load Balancer from
+# accessing Streamlit resources
 RUN bash -c 'echo -e "\
 [global]\n\
 logLevel = \"debug\"\n\
