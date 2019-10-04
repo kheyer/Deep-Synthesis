@@ -19,7 +19,7 @@ RUN pip --no-cache-dir install -r requirements.txt
 
 RUN git clone https://github.com/kheyer/OpenNMT-py 
 
-RUN python build/download_model.py
+RUN python build_local/download_model.py
 
 EXPOSE 8501
 
