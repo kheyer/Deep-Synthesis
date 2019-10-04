@@ -16,8 +16,8 @@ Clone the repository
 Run `buildEnv.sh`. This shell script will create a conda environment named `deep_synthesis`, install all required packages and download the trained model
 
     cd Deep-Synthesis
-    chmod +x buildEnv.sh
-    ./buildEnv.sh
+    chmod +x build_local/buildEnv.sh
+    ./build_local/buildEnv.sh
 
 Follow the package installation prompts.
 
@@ -38,8 +38,9 @@ Clone the repository
     
 Build the container
 
-    docker build -f build/local.Dockerfile -t deep_synthesis .
-    docker run -p 8501:8501 deep_synthesis
+    cd Deep-Synthesis
+    docker build -f build_local/local.Dockerfile -t deep_synthesis .
+    docker run -d -p 8501:8501 deep_synthesis
 
 The Streamlit app is now running locally on port 8501
 
@@ -80,28 +81,7 @@ To test CLI inference with the sample data provided, run:
 
 ## Training Locally
 
-If training sequence to sequence models is your thing, you can retrain the final model using the scripts in the `/train` directory.
-
-To download and preprocess the full training and validation datasets, run
-
-    chmod +x train/preprocessData.sh
-    ./train/preprocessData.sh
-    
-This will download the dataset to the `OpenNMT-py/data/` directory and run the OpenNMT preprocessing pipeline on the data. This will create processed data files and vocabulary files needed for training, as well as the model config file that specifies the model and training protocol. The model config can be found at `OpenNMT-py/config/molecular_transformer.yml`.
-
-To initiate training, run
-
-    chmod +x train/trainModel.sh
-    ./train/trainModel.sh
-    
-This will start the training protocol. The model config assumes you are running training on a GPU enabled device (you don't want to try this on a CPU).
-
-Training the final takes around ~3 days on a single 2080 Ti GPU, but decent results can be achieved after only 16 hours.
-
-To run local inference on a model checkpoint, the `translateData.sh` file shows how to interface with the default OpenNMT CLI for translation. Before running `translateData.sh`, it may be necessary to change the model step checkpoint (if you did not run training to completion). The default batch size may also need to be changed depending on the GPU memory available.
-
-    chmod +x train/translateData.sh
-    ./train/translateData.sh
+If training sequence to sequence models is your thing, you can retrain the final model using the scripts in the `/train` directory. See the README in the [train directory](https://github.com/kheyer/Deep-Synthesis/tree/training/train) for full instructions.
 
 
 # Running on the Cloud
