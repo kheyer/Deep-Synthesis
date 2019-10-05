@@ -115,7 +115,7 @@ def warmup(payload, function):
     print("warmup completed")
 
 @st.cache 
-def warmup_lambda(fan_size, function):
+def warmup_lambda(fan_size, function, seed=None):
     payload = { 'data': '""',
                 'beam': '',
                 'n_best': '',
