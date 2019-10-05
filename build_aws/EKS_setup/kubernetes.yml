@@ -57,7 +57,3 @@ spec:
     protocol: TCP
     port: 443
     targetPort: 8501
-  - name: test
-    protocol: TCP
-    port: 81
-    targetPort: 8501
