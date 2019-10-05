@@ -37,7 +37,8 @@ elif runtime == 'AWS':
 
     # Asyncronously ping fan_size instances concurrently
     # to prevent cold start
-    warmup_lambda(model_description['fan_size'], model_description['function'])
+    warmup_seed = 1
+    warmup_lambda(model_description['fan_size'], model_description['function'], seed=warmup_seed)
     
 else:
     raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
@@ -47,29 +48,21 @@ else:
 st.title('Deep Synthesis')
 
 input_options = app_setup()
-
 prediction_option = st.selectbox('Select an Input Format', input_options)
-
 single_predict, source_param, target_param = get_data_params(input_options, prediction_option)
 
-data_box = st.checkbox('Load Data')
+smile_data = load_data(single_predict, source_param, target_param)
+display_idx = display_slider(smile_data)
+display_data(smile_data, display_idx)
 
-if data_box:
-    smile_data = load_data(single_predict, source_param, target_param)
-    display_idx = display_slider(smile_data)
+# st.write('Input Prediction Parameters')
+# beam = int(st.selectbox('Select Beam Width', [1,2,3,5]))
+# n_best = int(st.selectbox('Select Top K Predictions', [1,2,3,5]))
 
-    display_data(smile_data, display_idx)
+beam, n_best = prediction_params(single_predict)
 
-    st.write('Input Prediction Parameters')
-    beam = int(st.selectbox('Select Beam Width', [1,2,3,5]))
-    n_best = int(st.selectbox('Select Top K Predictions', [1,2,3,5]))
+prediction = translate_data(smile_data, beam, n_best, True, translator_class, model_description)
 
-    prediction_box = st.checkbox('Run Prediction')
+display_prediction(prediction, display_idx)
 
-    if prediction_box:
-        placeholder = st.empty()
-        placeholder.text('Translation in Progress')
-        prediction = translate_data(smile_data, beam, n_best, True, translator_class, model_description)
-        placeholder.text('Translation Complete')
-
-        display_prediction(prediction, display_idx)
+download_data(single_predict, prediction)

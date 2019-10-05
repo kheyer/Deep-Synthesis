@@ -7,6 +7,7 @@ import time
 
 from preprocess import *
 from postprocess import *
+from confirm_button import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -61,7 +62,8 @@ def file_selector(folder_path='.', txt='Select a file'):
     selected_filename = st.selectbox(txt, filenames)
     return os.path.join(folder_path, selected_filename)
 
-@st.cache
+#@st.cache
+@cache_on_button_press('Load Data')
 def load_data(single_predict, source_param, target_param):
     # triggers actually loading the data
     # loaded data is cached
@@ -72,7 +74,7 @@ def load_data(single_predict, source_param, target_param):
         # Else, load from file
         data = SmilesData.file_entry(source_param, target_param)
 
-    # Returns a SilesData object
+    # Returns a SimlesData object
     return data 
 
 def display_data(smile_data, display_idx):
@@ -87,10 +89,14 @@ def display_slider(data):
     
     return display_idx
 
-@st.cache(ignore_hash=True)
+#@st.cache(ignore_hash=True)
+@cache_on_button_press('Predict Products')
 def translate_data(smile_data, beam, n_best, attention, translator_class, model_description):
     # Important note: translator class must be instantiated within this function for 
     # Streamlit caching to work properly
+    placeholder = st.empty()
+    placeholder.text('Prediction in Progress')
+
     start = time.time()
     translator = translator_class(model_description)
     scores, preds, attns = translator.run_translation(smile_data.smiles_tokens, 
@@ -98,6 +104,8 @@ def translate_data(smile_data, beam, n_best, attention, translator_class, model_
     prediction_time = time.time() - start
     prediction = Predictions(smile_data, preds, scores, attns)
     logger.info(f'Inference Time: {prediction_time}')
+
+    placeholder.text('Prediction Complete')
     return prediction
 
 @st.cache
@@ -131,3 +139,24 @@ def display_prediction(prediction, display_idx):
 
     st.write('\nPrediction Dataframe')
     st.dataframe(prediction.sample_df(display_idx))
+
+@cache_on_button_press('Save Prediction Data')
+def save_data(predictions, save_folder):
+    predictions.df.to_csv(save_folder, index=False)
+    st.text(f'Prediction data saved to {save_folder}')
+
+def download_data(single_predict, predictions):
+    if not single_predict:
+        save_folder = st.text_input('Prediction Save Destination', 'data/predictions.csv')
+        save_data(predictions, save_folder)
+
+def prediction_params(single_predict):
+    if single_predict:
+        beam = 5
+        n_best = 5
+    else:
+        st.write('Input Prediction Parameters')
+        beam = int(st.selectbox('Select Beam Width', [1,2,3,5]))
+        n_best = int(st.selectbox('Select Top K Predictions', [1,2,3,5]))
+
+    return beam, n_best
