@@ -4,33 +4,92 @@ from rdkit import Chem
 from rdkit.Chem import Draw
 import logging
 import time
-
+import json
+import numpy as np 
 from preprocess import *
 from postprocess import *
 from confirm_button import *
+from translate_aws import *
+from lambda_async import *
+
+# Importing translate also imports OpenNMT.
+# Putting this in a try/except block allows for deploying
+# the app configured to run AWS Lambda predictions
+# without bringing along OpenNMT
+try:
+    from translate import *
+except ModuleNotFoundError:
+    pass
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def app_setup():
-    # starter values for prediction type 
-    input_options = ['Predict from String', 'Predict from File']
+# Sample smiles for users to predict on
+example_smiles = [
+    'CCN.Oc1cccc2ccccc12.[Na+].[OH-].c1ccc(OP(Oc2ccccc2)Oc2ccccc2)cc1',
+    'CN(C)C=O.Cn1c(=O)n(CCCI)c2ccccc21.O=C([O-])[O-].O=c1[nH]c2cc(Cl)ccc2n1C1CCNCC1.[Na+].[Na+]',
+    'C1CNC1.CS(=O)(=O)OCCC#Cc1ccc2c(-c3ccc(Br)cc3)nsc2c1.O=C([O-])[O-].[Na+].[Na+]',
+    'CCN(CC)CC.CO.COC(=O)c1sc(Cl)c(Cl)c1NC(C)=O.[H][H]',
+    'C1CCOC1.CCC(C)(C)Cc1cn(S(=O)(=O)N(C)C)c(C(=O)Cc2ccc(Br)cc2)n1.C[Mg+].[Br-].[Ce+3].[Cl-].[Cl-].[Cl-]',
+    'CC1CO1.CCCBr.CCCCCC.CCN(CC)CC.CN(C)P(=O)(N(C)C)N(C)C.COc1cc([N+](=O)[O-])c2ncccc2c1O.O',
+    'C1CCOC1.CCOC(=O)CCCCCOc1c(C=CC(=O)CCc2ccccc2)occc1=O.CC[BH-](CC)CC.[Li+]',
+    'C#Cc1ccccc1.CCN(CC)CC.CCN(CC)CCOc1cc(Cl)c(I)cc1Cl.[Cu]I.[Pd]',
+    'Cl.I.O.O=C(c1ccccc1)c1ccc(O)cc1.[I-].[K+].[NH4+].[OH-]',
+    'O=Cc1cncc(Cl)c1COC1CCCCO1.OCc1c(Cl)cncc1Cl'
+]
 
-    return input_options
+def app_setup(args):
+    # Dictionary of configuration files
+    config_json_opts = {
+                        'AWS' : 'configs/aws_description.json',
+                        'local' : 'configs/model_description.json'
+                    }
 
-def get_data_params(input_options, prediction_options):
+    runtime = args.runtime 
+    model_description = json.load(open(config_json_opts[runtime]))
+
+    # Define class to handle translations based on runtime
+    if runtime == 'local':
+        translator_class = TranslationModel
+
+        input_options = ['Predict from String', 'Predict from File']
+        option_output = st.sidebar.selectbox('Select an Input Format', input_options)
+
+    elif runtime == 'AWS':
+        translator_class = LambdaInterface
+
+        # Asyncronously ping fan_size instances concurrently
+        # to prevent cold start
+        warmup_seed = 1
+        warmup_lambda(model_description['fan_size'], model_description['function'], seed=warmup_seed)
+        option_output = 'Predict from String'
+        
+    else:
+        raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
+                    'AWS' to run predictions on AWS (AWS inference requires permissions)''')
+
+    # get data params during setup
+    single_predict, smile, target = get_data_params(option_output)
+
+    return model_description, translator_class, single_predict, smile, target
+
+def get_data_params(prediction_options):
     # function determines if prediction will be run on a string input by the user
     # or from a file of SMILES strings
-    if prediction_options == input_options[0]:
+    if prediction_options == 'Predict from String':
         single_predict = True
     else:
         single_predict = False 
 
     if single_predict:
         # If single predict, create a text box for user input
-        base_smile = 'O=Cc1cncc(Cl)c1COC1CCCCO1.OCc1c(Cl)cncc1Cl'
-        smile = st.text_input('Input Source SMILES (Required)', base_smile)
-        target_smile = st.text_input('Input Target SMILES (Optional)' , '')
+        # seed UI with sample reaction
+        sample_rxn = st.sidebar.selectbox('Choose sample reaction', example_smiles,
+                                     format_func=format_smiles)
+
+        message = 'Enter a SMILES string of reactants, or choose an example reaction from the sidebar on the left'
+        smile = st.text_input(message, sample_rxn)
+        target_smile = None
         # returns single_predict (bool), smile (string), target_smile (string)
         return single_predict, smile, target_smile
     else:
@@ -62,7 +121,6 @@ def file_selector(folder_path='.', txt='Select a file'):
     selected_filename = st.selectbox(txt, filenames)
     return os.path.join(folder_path, selected_filename)
 
-#@st.cache
 @cache_on_button_press('Load Data')
 def load_data(single_predict, source_param, target_param):
     # triggers actually loading the data
@@ -142,15 +200,19 @@ def display_prediction(prediction, display_idx):
 
 @cache_on_button_press('Save Prediction Data')
 def save_data(predictions, save_folder):
+    # button to save data to some input file path
     predictions.df.to_csv(save_folder, index=False)
     st.text(f'Prediction data saved to {save_folder}')
 
 def download_data(single_predict, predictions):
+    # text inpout box for path to save prediction data
     if not single_predict:
         save_folder = st.text_input('Prediction Save Destination', 'data/predictions.csv')
         save_data(predictions, save_folder)
 
 def prediction_params(single_predict):
+    # get beam search parameters depending on prediction type
+    # beam/n_best parameters are only exposed for bulk prediction
     if single_predict:
         beam = 5
         n_best = 5
@@ -160,3 +222,9 @@ def prediction_params(single_predict):
         n_best = int(st.selectbox('Select Top K Predictions', [1,2,3,5]))
 
     return beam, n_best
+
+def format_smiles(smile):
+    # string formatting function for streamlit sidebar
+    if len(smile) > 20:
+        smile = smile[:20] + '...'
+    return smile
