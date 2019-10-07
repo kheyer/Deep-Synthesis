@@ -120,10 +120,10 @@ def display_parameters(prediction, idx=0):
     
     if prediction.do_target:
         correct = list(prediction.df[prediction.df.ID == idx].Correct.values)
-        legend = [f'Prediction {i}, Probability {np.exp(score):.4} ({corr})' 
+        legend = [f'Product Prediction {i+1}, Probability {np.exp(score):.4} ({corr})' 
                   for i, (score, corr) in enumerate(zip(scores, correct))]
     else:
-        legend = [f'Prediction {i}, Probability {np.exp(score):.4}' 
+        legend = [f'Product Prediction {i+1}, Probability {np.exp(score):.4}' 
                   for i, score in enumerate(scores)]
         
     params = list(zip(source_tokens, prediction_tokens, attentions, legend))
@@ -138,7 +138,7 @@ def plot_prediction(source_tokens, prediction_tokens, attention, legend, img_siz
     # canonicalized predictions may be rearranged
     source_mol = Chem.MolFromSmiles(process_prediction(source_tokens))
     prediction_mol = Chem.MolFromSmiles(process_prediction(prediction_tokens))
-    legends = ['Source', legend]
+    legends = ['Reactants', legend]
     
     im = Draw.MolsToGridImage([source_mol, prediction_mol], legends=legends, subImgSize=img_size,
                                  molsPerRow=2)
@@ -165,7 +165,7 @@ def plot_attention(source, target, attention):
                     cbar_kws={"shrink": 0.5, 'pad':0.04, 'label': 'Attention Score'})
 
     ax.set_xlabel('Source Tokens')
-    ax.set_ylabel('Target Tokens')
+    ax.set_ylabel('Prediction Tokens')
 
     loc, labels = plt.yticks()
     ax.set_yticklabels(labels, rotation=360)

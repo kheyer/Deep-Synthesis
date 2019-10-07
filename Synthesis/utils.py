@@ -87,7 +87,8 @@ def get_data_params(prediction_options):
         sample_rxn = st.sidebar.selectbox('Choose sample reaction', example_smiles,
                                      format_func=format_smiles)
 
-        message = 'Enter a SMILES string of reactants, or choose an example reaction from the sidebar on the left'
+        message = 'Enter a SMILES string of reactants, or choose an example reaction \
+                    from the sidebar on the left.\nThen press the "Load Data" button.'
         smile = st.text_input(message, sample_rxn)
         target_smile = None
         # returns single_predict (bool), smile (string), target_smile (string)

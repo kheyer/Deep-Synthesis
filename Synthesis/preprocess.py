@@ -47,12 +47,12 @@ class SmilesData():
         # If targets are provided, target is also shown
         mol = [Chem.MolFromSmiles(self.smiles[idx])]
         row = 1
-        legend = [f'Source']
+        legend = [f'Reactants']
         
         if self.target:
             mol += [Chem.MolFromSmiles(self.target[idx])]
             row += 1   
-            legend += [f'Target']
+            legend += [f'Product']
 
         return Draw.MolsToGridImage(mol, molsPerRow=row, legends=legend, subImgSize=img_size)
 
