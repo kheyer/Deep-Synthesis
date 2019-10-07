@@ -1,6 +1,6 @@
 # Streamlit confirm button with caching
 # Source:
-# https://gist.githubusercontent.com/treuille/bc4eacbb00bfc846b73eec2984869645/raw/19f11f309f91ab97fb93580e2dd1db29cba248df/confirm_button_hack.py
+# https://gist.github.com/treuille/bc4eacbb00bfc846b73eec2984869645
 
 import streamlit as st
 import collections
