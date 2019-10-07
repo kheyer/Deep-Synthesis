@@ -1,5 +1,6 @@
 from rdkit import Chem
 from rdkit.Chem import Draw
+import streamlit as st
 
 class SmilesData():
     def __init__(self, smiles, tokens, target=None, target_tokens=None):
@@ -128,6 +129,10 @@ def canonicalize_smiles(smiles, remove_stereo=True):
     if remove_stereo and '@' in smiles:
             Chem.rdmolops.RemoveStereochemistry(mol)
     
+    if mol is None:
+        message = f'''Error: Input string {smiles} failed to convert to a molecular structure.
+                         Ensure your SMILES strings are compatible with RDKit.'''
+        st.error(message)
     assert mol is not None
     
     return Chem.MolToSmiles(mol, isomericSmiles=True)
