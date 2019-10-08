@@ -1,5 +1,6 @@
 from rdkit import Chem
 from rdkit.Chem import Draw
+from rdkit.Chem import AllChem
 import pandas as pd
 import numpy as np
 from collections import namedtuple
@@ -136,12 +137,31 @@ def plot_prediction(source_tokens, prediction_tokens, attention, legend, img_siz
     # Attention scores are plotted against source and prediction tokens
     ### IMPORTANT attention plot must be generated with raw prediction tokens ###
     # canonicalized predictions may be rearranged
-    source_mol = Chem.MolFromSmiles(process_prediction(source_tokens))
-    prediction_mol = Chem.MolFromSmiles(process_prediction(prediction_tokens))
-    legends = ['Reactants', legend]
+
+    source_compounds = process_prediction(source_tokens)
+
+    if '.' in source_compounds:
+        compounds = source_compounds.split('.')
+        reactants = []
+        reagents = []
+        for compound in compounds:
+            if compound[0] == '[' and compound[-1] == ']':
+                reagents.append(compound)
+            elif compound == 'O':
+                reagents.append(compound)
+            else:
+                reactants.append(compound)
+        
+        reactants = '.'.join(reactants)
+        reagents = '.'.join(reagents)
     
-    im = Draw.MolsToGridImage([source_mol, prediction_mol], legends=legends, subImgSize=img_size,
-                                 molsPerRow=2)
+    else:
+        reactants = source_compounds
+        reagents = ''
+
+    rxn = reactants + '>' + reagents + '>' + process_prediction(prediction_tokens)
+    rxn = AllChem.ReactionFromSmarts(rxn, useSmiles=True)
+    im = Draw.ReactionToImage(rxn, subImgSize=img_size)
     
     attn_plot = plot_attention(source_tokens, prediction_tokens, attention)
     
