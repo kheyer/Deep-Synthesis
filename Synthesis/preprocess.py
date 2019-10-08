@@ -46,15 +46,13 @@ class SmilesData():
         # Indexes into self.smiles with idx and displays an RDKit image of the SMILES 
         # If targets are provided, target is also shown
         mol = [Chem.MolFromSmiles(self.smiles[idx])]
-        row = 1
         legend = [f'Reactants']
         
         if self.target:
             mol += [Chem.MolFromSmiles(self.target[idx])]
-            row += 1   
             legend += [f'Product']
 
-        return Draw.MolsToGridImage(mol, molsPerRow=row, legends=legend, subImgSize=img_size)
+        return Draw.MolsToGridImage(mol, molsPerRow=2, legends=legend, subImgSize=img_size)
 
     def data_pair(self, idx):
         # access a single example via index
