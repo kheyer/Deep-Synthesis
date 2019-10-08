@@ -47,10 +47,12 @@ else:
 data = SmilesData.file_entry(args.source_file, args.target_file)
 
 # run interence
+translator = translator_class(model_description)
 # returning attention maps for CLI inference is not supported 
-prediction = translate_data(data, int(args.beam), int(args.n_best), False, translator_class, model_description)
+scores, preds, attns = translator.run_translation(data.smiles_tokens, 
+                            beam=int(args.beam), n_best=int(args.n_best), return_attention=False)
+
+prediction = Predictions(data, preds, scores, attns)
 
 # save prediction to destination filename
 prediction.df.to_csv(args.destination_file, index=False)
-
-
