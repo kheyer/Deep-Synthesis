@@ -23,7 +23,8 @@ display_data(smile_data, display_idx)
 beam, n_best = prediction_params(single_predict)
 
 st.text('Everything look right? Press the "Predict Products" button to generate predictions')
-prediction = translate_data(smile_data, beam, n_best, True, translator_class, model_description)
+prediction = translate_data(smile_data, beam, n_best, True, translator_class, 
+                            model_description)
 
 display_prediction(prediction, display_idx)
 

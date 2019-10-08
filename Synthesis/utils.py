@@ -60,8 +60,8 @@ def app_setup(args):
 
         # Asyncronously ping fan_size instances concurrently
         # to prevent cold start
-        warmup_seed = 1
-        warmup_lambda(model_description['fan_size'], model_description['function'], seed=warmup_seed)
+        session_token = time.localtime().tm_min
+        warmup_lambda(model_description['fan_size'], model_description['function'], seed=session_token)
         option_output = 'Predict from String'
         
     else:
@@ -150,7 +150,8 @@ def display_slider(data):
 
 #@st.cache(ignore_hash=True)
 @cache_on_button_press('Predict Products')
-def translate_data(smile_data, beam, n_best, attention, translator_class, model_description):
+def translate_data(smile_data, beam, n_best, attention, translator_class, 
+                    model_description):
     # Important note: translator class must be instantiated within this function for 
     # Streamlit caching to work properly
     placeholder = st.empty()
