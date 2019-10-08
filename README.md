@@ -14,11 +14,11 @@ Deep Synthesis is running online at [deepsynthesis.xyz](deepsynthesis.xyz). Usin
 
 Input your SMILES string into the text box, or choose one of the examples in the drop down menu on the left. Clicking the "Predict Products" button generates a set of predicted reaction products.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction1.png" width="500" alt="prediction from string">
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/master/media/prediction1.png" width="500" alt="prediction from string">
 
 Predictions can be further inspected by looking at attention maps between reactant and predicted product strings.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction2.png" width="500" alt="prediction from string">
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/master/media/prediction2.png" width="500" alt="prediction from string">
 
 
 ### Running Locally

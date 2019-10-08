@@ -87,7 +87,7 @@ def explanation_page():
     st.write('## The Model')
     st.write('Inspired by [Schwaller et al.](https://arxiv.org/abs/1811.02633), Deep Synthesis ',
              'uses a sequence to sequence transformer model to translate Reactant SMILES into Product SMILES.')
-    st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/training/media/model.png',
+    st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/master/media/model.png',
                 width=400)
 
 def tutorial_page(runtime):
@@ -103,7 +103,7 @@ def tutorial_page(runtime):
                 'see a visual representation of the input SMILES string')
     st.write('Once the data is loaded, click the "Predict Products" button to run inference on your SMILES.')
 
-    st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/training/media/prediction1.png',
+    st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/master/media/prediction1.png',
                 use_column_width=True)
 
     st.write('Once inference has been run, you can examine individual predictions by looking at ',
@@ -111,7 +111,7 @@ def tutorial_page(runtime):
              'Attention maps give an idea of what features the model is paying attention to for ',
              'generating the product molecule.')
 
-    st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/training/media/prediction2.png',
+    st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/master/media/prediction2.png',
                 use_column_width=True)
 
     if runtime == 'local':
@@ -128,7 +128,7 @@ def tutorial_page(runtime):
         st.write('Once the correct files are selected, click the "Load Data" button. This loads all data ',
                  'from the selected file, and creates a slider on the left to scroll through the data.')
 
-        st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/training/media/prediction3.png',
+        st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/master/media/prediction3.png',
                     use_column_width=True)
 
         st.write('Prediction runs the same as the single string input case. Once your predictions have ',
@@ -136,7 +136,7 @@ def tutorial_page(runtime):
                 'Enter the save path into the "Prediction Save Destination" dialogue box and ',
                 'click the "Save Prediction Data" button.')
 
-        st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/training/media/prediction4.png',
+        st.image('https://raw.githubusercontent.com/kheyer/Deep-Synthesis/master/media/prediction4.png',
                     use_column_width=True)
 
     st.write('## Extra notes for those familiar with SMILES and computational chemistry')

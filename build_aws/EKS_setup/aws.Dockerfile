@@ -5,7 +5,7 @@ ENV PATH /opt/conda/envs/deep_synthesis/bin:$PATH
 RUN /bin/bash -c "source activate deep_synthesis"
 RUN conda install -n deep_synthesis rdkit -c rdkit
 
-RUN git clone -b training https://github.com/kheyer/Deep-Synthesis 
+RUN git clone https://github.com/kheyer/Deep-Synthesis 
 
 RUN mkdir -p /root/.streamlit
 
