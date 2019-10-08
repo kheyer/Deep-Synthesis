@@ -32,3 +32,7 @@ For instructions on how to set up locally, see the README of the `build_local` d
 ### Running on AWS
 
 For scalable deployments, we can set up a Kubernetes cluster on AWS to host the front end of the application and a AWS Lambda function to handle inference. If you want to replicate the setup used to host the application on [deepsynthesis.xyz](deepsynthesis.xyz), see the README of the `build_aws` directory. Note that AWS setup is much more involved than local setup, and requires an AWS IAM account with permissions for EKS, EC2 and Lambda.
+
+### Project Slides
+
+For more details on the project, see the [presentation slides](https://docs.google.com/presentation/d/1YdgaQKAF6Aw3qw0qi9z3Ze6R71vwK7Lpk5uczrCd2zM/edit#slide=id.g64612c95ea_0_0)
