@@ -1,6 +1,8 @@
 # Streamlit confirm button with caching
 # Source:
 # https://gist.github.com/treuille/bc4eacbb00bfc846b73eec2984869645
+# Written by Adrien Treuille
+# https://gist.github.com/treuille
 
 import streamlit as st
 import collections

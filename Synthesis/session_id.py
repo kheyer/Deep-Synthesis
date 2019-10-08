@@ -1,4 +1,7 @@
 # https://gist.github.com/tvst/6ef6287b2f3363265d51531c62a84f51
+# Streamlit session specific caching
+# Written by Thiago Teixeira
+# https://gist.github.com/tvst
 
 import streamlit.ReportThread as ReportThread
 from streamlit.server.Server import Server
