@@ -1,77 +1,38 @@
 # Deep Synthesis
-A deep learning framework for predicting chemical synthesis
 
-## Local Setup
+Deep Synthesis is a deep learning driven application for predicting the products of an organic chemical reaction. Deep Synthesis runs a deep learning machine translation model inspired by [Schwaller et al](https://arxiv.org/abs/1811.02633) that takes as input the SMILES string representation of chemcal reactants, and "translates" them to the SMILES strings of the products.
 
-Follow these instructions to set up Deep Synthesis on your local machine
+Deep Synthesis allows chemists and chemistry enthusiasts to experiment with reactions in silico.
 
-Clone the repository
+## How to Use
 
-    git clone https://github.com/kheyer/Deep-Synthesis
+There are a number of ways to use Deep Synthesis. Choose the one that best fits your needs.
 
-Run `buildEnv.sh`. This shell script will create a conda environment named `deep_synthesis`, install all required packages and download the trained model
+### Online Web App
 
-    cd Deep-Synthesis
-    chmod +x buildEnv.sh
-    ./buildEnv.sh
+Deep Synthesis is running online at [deepsynthesis.xyz](deepsynthesis.xyz). Using the web app is great if you want to play with the model or run a small number of predictions.
 
-Follow the package installation prompts.
+Input your SMILES string into the text box, or choose one of the examples in the drop down menu on the left. Clicking the "Predict Products" button generates a set of predicted reaction products.
 
-Once package installation is complete, activate the new conda environment and start the Streamlit app
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction1.png" width="500" alt="prediction from string">
 
-    source activate deep_synthesis
-    streamlit run Synthesis/app.py local
+Predictions can be further inspected by looking at attention maps between reactant and predicted product strings.
 
-The Streamlit app is now running locally on port 8501
-
-## Local Docker Setup
-
-To build a Docker container running the application locally, run the following:
-
-Clone the repository
-
-    git clone https://github.com/kheyer/Deep-Synthesis
-    
-Build the container
-
-    docker build -f build/local.Dockerfile -t deep_synthesis .
-    docker run -p 8501:8501 deep_synthesis
-
-The Streamlit app is now running locally on port 8501
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction2.png" width="500" alt="prediction from string">
 
 
-## Local Inference
+### Running Locally
 
-Once the Streamlit app is running locally, inference can be run on local hardware. There are two ways to run inference. The "Predict from String" option predicts on a single SMILES string entered into the text entry box.
+Deep Synthesis can easily be set up on your local machine, either as a Docker container or a conda environment. Local setup is best if you want to run bulk predictions or tinker with the app.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/main_setup_branch/media/local_prediction_1.png" width="500" alt="local prediction from string">
+Local setup supports bulk prediction from a text file of SMILES string, either through the app GUI or a command line interface.
 
-Alternatively, the "Predict from File" option predicts in bulk from a text file containing multiple SMILES inputs. The inputs should be formatted with one set of reactants per line. See the example files in the `/data` directory. The "Predict from File" option expects the source file to be stored locally. The file path to the source file defaults to the `/data` directory, but can be pointed at any file path relative to the repo file.
+For instructions on how to set up locally, see the README of the `build_local` directory.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/main_setup_branch/media/local_prediction_2.png" width="500" alt="local prediction from file">
+### Running on AWS
 
-For both prediction formats, known target product SMILES can optionally be provided. If target SMILES are provided, predictions are automatically scored.
+For scalable deployments, we can set up a Kubernetes cluster on AWS to host the front end of the application and a AWS Lambda function to handle inference. If you want to replicate the setup used to host the application on [deepsynthesis.xyz](deepsynthesis.xyz), see the README of the `build_aws` directory. Note that AWS setup is much more involved than local setup, and requires an AWS IAM account with permissions for EKS, EC2 and Lambda.
 
-Once predictions are generated, they can be visualized using the slider bar. Source-to-prediction attention maps are also generated.
+### Project Slides
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/main_setup_branch/media/local_prediction_3.png" width="500" alt="local prediction evaluation">
-
-## Requisites
-
-#### Dependencies
-
-#### Installation
-
-## Build Environment
-
-## Configs
-
-## Test
-
-## Run Inference
-
-## Build Model
-
-## Serve Model
-
-## Analysis
+For more details on the project, see the [presentation slides](https://docs.google.com/presentation/d/1YdgaQKAF6Aw3qw0qi9z3Ze6R71vwK7Lpk5uczrCd2zM/edit#slide=id.g64612c95ea_0_0)

@@ -9,4 +9,4 @@ pip --no-cache-dir install -r requirements.txt
 echo "Cloning OpenNMT"
 git clone https://github.com/kheyer/OpenNMT-py
 echo "Downloading Model"
-python build/download_model.py
+python build_local/download_model.py

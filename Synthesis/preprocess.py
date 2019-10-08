@@ -1,5 +1,6 @@
 from rdkit import Chem
 from rdkit.Chem import Draw
+import streamlit as st
 
 class SmilesData():
     def __init__(self, smiles, tokens, target=None, target_tokens=None):
@@ -45,15 +46,13 @@ class SmilesData():
         # Indexes into self.smiles with idx and displays an RDKit image of the SMILES 
         # If targets are provided, target is also shown
         mol = [Chem.MolFromSmiles(self.smiles[idx])]
-        row = 1
-        legend = [f'Source']
+        legend = [f'Reactants']
         
         if self.target:
             mol += [Chem.MolFromSmiles(self.target[idx])]
-            row += 1   
-            legend += [f'Target']
+            legend += [f'Product']
 
-        return Draw.MolsToGridImage(mol, molsPerRow=row, legends=legend, subImgSize=img_size)
+        return Draw.MolsToGridImage(mol, molsPerRow=2, legends=legend, subImgSize=img_size)
 
     def data_pair(self, idx):
         # access a single example via index
@@ -128,6 +127,10 @@ def canonicalize_smiles(smiles, remove_stereo=True):
     if remove_stereo and '@' in smiles:
             Chem.rdmolops.RemoveStereochemistry(mol)
     
+    if mol is None:
+        message = f'''Error: Input string {smiles} failed to convert to a molecular structure.
+                         Ensure your SMILES strings are compatible with RDKit.'''
+        st.error(message)
     assert mol is not None
     
     return Chem.MolToSmiles(mol, isomericSmiles=True)

@@ -114,3 +114,6 @@ dmypy.json
 /OpenNMT-py
 /OpenNMT-py/*
 /models/*
+
+# block all model files
+*.pt

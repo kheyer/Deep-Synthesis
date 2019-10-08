@@ -107,14 +107,15 @@ def background(f):
 
 @background
 def warmup(payload, function):
-    client = boto3.client('lambda')
+    client = boto3.client('lambda', 'us-west-2')
     print('sending request')
     client.invoke(FunctionName=function,
                              InvocationType='RequestResponse',
                              Payload=json.dumps(payload))
     print("warmup completed")
 
-def warmup_lambda(fan_size, function):
+@st.cache 
+def warmup_lambda(fan_size, function, seed=None):
     payload = { 'data': '""',
                 'beam': '',
                 'n_best': '',

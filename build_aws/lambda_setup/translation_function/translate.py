@@ -97,7 +97,7 @@ class TranslationModel:
         if return_attention:
             return (scores, preds, attns)
         else:
-            return (scores, preds)
+            return (scores, preds, None)
 
     def reset_params(self):
         # reset beam_size and n_best parameters if desired
