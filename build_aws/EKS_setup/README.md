@@ -123,3 +123,7 @@ To configure cluster autoscaling, go to the `Auto Scaling Groups` section of the
  * Max - 1
 
 Edit these numbers to match your expected needs. Note that creating a new node creates a new EC2 instance, which incurs charges.
+
+### Load Balancer
+
+When we applied the Kubernetes config, we also created a load balancer to handle ingress into the cluster. Now that everything is set up, we can use the load balancer to access the application. Go to the Load Balancer section of the EC2 console and locate the load balancer created during EKS setup. Under the "Description" tab, there is a section for the DNS Name of the load balancer. This link can be used to access the application.
