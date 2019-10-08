@@ -11,6 +11,7 @@ from postprocess import *
 from confirm_button import *
 from translate_aws import *
 from lambda_async import *
+from session_id import *
 
 # Importing translate also imports OpenNMT.
 # Putting this in a try/except block allows for deploying
@@ -54,14 +55,15 @@ def app_setup(args):
 
         input_options = ['Predict from String', 'Predict from File']
         option_output = st.sidebar.selectbox('Select an Input Format', input_options)
+        session_id = 0
 
     elif runtime == 'AWS':
         translator_class = LambdaInterface
 
         # Asyncronously ping fan_size instances concurrently
         # to prevent cold start
-        session_token = time.localtime().tm_min
-        warmup_lambda(model_description['fan_size'], model_description['function'], seed=session_token)
+        session_id = get_session_id()
+        warmup_lambda(model_description['fan_size'], model_description['function'], seed=session_id)
         option_output = 'Predict from String'
         
     else:
@@ -71,7 +73,8 @@ def app_setup(args):
     # get data params during setup
     single_predict, smile, target = get_data_params(option_output)
 
-    return model_description, translator_class, single_predict, smile, target
+    return model_description, translator_class, single_predict, smile, target, session_id
+
 
 def get_data_params(prediction_options):
     # function determines if prediction will be run on a string input by the user
@@ -100,6 +103,7 @@ def get_data_params(prediction_options):
         # target_filename (string to .txt filename if desired, else None)
         return single_predict, source_filename, target_filename
 
+
 def get_filenames(path='data'):
     # Creates interface for user to select a file to load
     # file must be stored locally in a directory accessable from the streamlit app
@@ -123,7 +127,7 @@ def file_selector(folder_path='.', txt='Select a file'):
     return os.path.join(folder_path, selected_filename)
 
 @cache_on_button_press('Load Data')
-def load_data(single_predict, source_param, target_param):
+def load_data(single_predict, source_param, target_param, session_id=None):
     # triggers actually loading the data
     # loaded data is cached
     if single_predict:
@@ -151,7 +155,7 @@ def display_slider(data):
 #@st.cache(ignore_hash=True)
 @cache_on_button_press('Predict Products')
 def translate_data(smile_data, beam, n_best, attention, translator_class, 
-                    model_description):
+                    model_description, session_id=None):
     # Important note: translator class must be instantiated within this function for 
     # Streamlit caching to work properly
     placeholder = st.empty()
