@@ -1,5 +1,8 @@
 # Deep Synthesis
-A deep learning framework for predicting chemical synthesis
+
+Deep Synthesis is a deep learning driven application for predicting the products of an organic chemical reaction. Deep Synthesis runs a deep learning machine translation model inspired by [Schwaller et al](https://arxiv.org/abs/1811.02633) that takes as input the SMILES string representation of chemcal reactants, and "translates" them to the SMILES strings of the products.
+
+Deep Synthesis allows chemists and chemistry enthusiasts to experiment with reactions in silico.
 
 ## How to Use
 
@@ -8,6 +11,15 @@ There are a number of ways to use Deep Synthesis. Choose the one that best fits 
 ### Online Web App
 
 Deep Synthesis is running online at [deepsynthesis.xyz](deepsynthesis.xyz). Using the web app is great if you want to play with the model or run a small number of predictions.
+
+Input your SMILES string into the text box, or choose one of the examples in the drop down menu on the left. Clicking the "Predict Products" button generates a set of predicted reaction products.
+
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction1.png" width="500" alt="prediction from string">
+
+Predictions can be further inspected by looking at attention maps between reactant and predicted product strings.
+
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction2.png" width="500" alt="prediction from string">
+
 
 ### Running Locally
 
