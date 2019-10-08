@@ -1,6 +1,7 @@
 import streamlit as st 
 import os
 from rdkit import Chem
+from rdkit.Chem import AllChem
 from rdkit.Chem import Draw
 import logging
 import time
@@ -12,6 +13,7 @@ from confirm_button import *
 from translate_aws import *
 from lambda_async import *
 from session_id import *
+from landing_page import *
 
 # Importing translate also imports OpenNMT.
 # Putting this in a try/except block allows for deploying
@@ -53,8 +55,9 @@ def app_setup(args):
     if runtime == 'local':
         translator_class = TranslationModel
 
-        input_options = ['Predict from String', 'Predict from File']
-        option_output = st.sidebar.selectbox('Select an Input Format', input_options)
+        input_options = ['Welcome to Deep Synthesis', 'How it Works', 'Deep Synthesis Tutorial',
+                         'Predict from String', 'Predict from File']
+        option_output = st.sidebar.selectbox('Select Page', input_options)
         session_id = 0
 
     elif runtime == 'AWS':
@@ -64,27 +67,39 @@ def app_setup(args):
         # to prevent cold start
         session_id = get_session_id()
         warmup_lambda(model_description['fan_size'], model_description['function'], seed=session_id)
-        option_output = 'Predict from String'
+        input_options = ['Welcome to Deep Synthesis', 'How it Works',
+                         'Deep Synthesis Tutorial', 'Predict from String']
+        option_output = st.sidebar.selectbox('Select Page', input_options)
         
     else:
         raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
                     'AWS' to run predictions on AWS (AWS inference requires permissions)''')
 
     # get data params during setup
-    single_predict, smile, target = get_data_params(option_output)
+    single_predict, smile, target = get_data_params(option_output, runtime)
 
     return model_description, translator_class, single_predict, smile, target, session_id
 
-
-def get_data_params(prediction_options):
+def get_data_params(prediction_options, runtime):
     # function determines if prediction will be run on a string input by the user
     # or from a file of SMILES strings
-    if prediction_options == 'Predict from String':
-        single_predict = True
-    else:
-        single_predict = False 
+    if prediction_options == 'Welcome to Deep Synthesis':
+        landing_page()
 
-    if single_predict:
+        return None, None, None
+
+    elif prediction_options == 'How it Works':
+        explanation_page()
+
+        return None, None, None
+
+    elif prediction_options == 'Deep Synthesis Tutorial':
+        tutorial_page(runtime)
+
+        return None, None, None
+
+    elif prediction_options == 'Predict from String':
+        single_predict = True
         # If single predict, create a text box for user input
         # seed UI with sample reaction
         sample_rxn = st.sidebar.selectbox('Choose sample reaction', example_smiles,
@@ -96,13 +111,14 @@ def get_data_params(prediction_options):
         target_smile = None
         # returns single_predict (bool), smile (string), target_smile (string)
         return single_predict, smile, target_smile
+
     else:
+        single_predict = False 
         # If file predict, create text boxes that let users navigate to the prediction file
         source_filename, target_filename = get_filenames()
         # returns single_predict (bool), source_filename (string to .txt filename)
         # target_filename (string to .txt filename if desired, else None)
         return single_predict, source_filename, target_filename
-
 
 def get_filenames(path='data'):
     # Creates interface for user to select a file to load
@@ -142,7 +158,7 @@ def load_data(single_predict, source_param, target_param, session_id=None):
 
 def display_data(smile_data, display_idx):
     # displays data held in a SmilesData object
-    return st.image(smile_data.display(idx=display_idx, img_size=(300,300)))
+    return st.image(smile_data.display(idx=display_idx, img_size=(500,500)), use_column_width=True)
 
 def display_slider(data):
     if len(data) > 1:
@@ -182,7 +198,7 @@ def display_prediction(prediction, display_idx):
 
     st.write(f'Top {prediction.top_k} Predictions')
     st.image(plot_topk([i.prediction_tokens for i in prediction_data],
-                        [i.legend for i in prediction_data], img_size=(300,300)))
+                        [i.legend for i in prediction_data], img_size=(400,400)), use_column_width=True)
 
     if len(prediction_data) > 1:
         view_idx = st.slider('View Prediction (In Order of Model Confidence)', 0, len(prediction_data)-1, 0)
@@ -194,11 +210,15 @@ def display_prediction(prediction, display_idx):
                                     current_prediction.prediction_tokens,
                                     current_prediction.attention,
                                     current_prediction.legend,
-                                    img_size=(300,300))
+                                    img_size=(200,400))
 
-    st.write(f'Predicted Smile: {process_prediction(current_prediction.prediction_tokens)}')
+    st.write(current_prediction.legend)
     if im:
-        st.image(im)
+        st.image(im, use_column_width=True)
+    st.write(f'Predicted Smile: {process_prediction(current_prediction.prediction_tokens)}')
+    full_rxn = process_prediction(current_prediction.source_tokens) + '>>' + process_prediction(current_prediction.prediction_tokens)
+    st.write(f'Full Predicted Reaction: {full_rxn}')
+    st.write('')
     st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
 
     st.write('\nPrediction Dataframe')

@@ -15,19 +15,20 @@ st.title('Deep Synthesis')
 (model_description, translator_class, single_predict, 
         source_param, target_param, session_id) = app_setup(args)
 
-smile_data = load_data(single_predict, source_param, 
-                        target_param, session_id=session_id)
+if source_param:
+    smile_data = load_data(single_predict, source_param, 
+                            target_param, session_id=session_id)
 
-# create slider to display data
-display_idx = display_slider(smile_data)
-display_data(smile_data, display_idx)
+    # create slider to display data
+    display_idx = display_slider(smile_data)
+    display_data(smile_data, display_idx)
 
-beam, n_best = prediction_params(single_predict)
+    beam, n_best = prediction_params(single_predict)
 
-st.text('Everything look right? Press the "Predict Products" button to generate predictions')
-prediction = translate_data(smile_data, beam, n_best, True, translator_class, 
-                            model_description, session_id=session_id)
+    st.text('Everything look right? Press the "Predict Products" button to generate predictions')
+    prediction = translate_data(smile_data, beam, n_best, True, translator_class, 
+                                model_description, session_id=session_id)
 
-display_prediction(prediction, display_idx)
+    display_prediction(prediction, display_idx)
 
-download_data(single_predict, prediction)
+    download_data(single_predict, prediction)
