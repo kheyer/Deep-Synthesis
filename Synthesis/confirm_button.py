@@ -9,6 +9,7 @@ import collections
 import functools
 import inspect
 import textwrap
+from session_id import *
 
 def cache_on_button_press(label, show_spinner=True):
     """Function decorator to memoize function executions.
@@ -39,7 +40,8 @@ def cache_on_button_press(label, show_spinner=True):
     def function_decorator(func):
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs):
-            @st.cache(ignore_hash=True, show_spinner=show_spinner)
+            @fancy_cache(ignore_hash=True, show_spinner=show_spinner,
+                         unique_to_session=True, ttl=3600)
             def get_cache_entry(func, args, kwargs):
                 class ButtonCacheEntry:
                     def __init__(self):

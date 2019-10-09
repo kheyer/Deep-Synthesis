@@ -20,6 +20,7 @@ import time
 import aiohttp
 import boto3
 from botocore import session, awsrequest, auth
+from session_id import *
 
 AWS_CREDENTIALS = session.Session().get_credentials()
 
@@ -114,7 +115,8 @@ def warmup(payload, function):
                              Payload=json.dumps(payload))
     print("warmup completed")
 
-@st.cache 
+# Within a given session, ping will fire every 30 seconds
+@fancy_cache(unique_to_session=True, ttl=30)
 def warmup_lambda(fan_size, function, seed=None):
     payload = { 'data': '""',
                 'beam': '',

@@ -58,15 +58,13 @@ def app_setup(args):
         input_options = ['Welcome to Deep Synthesis', 'How it Works', 'Deep Synthesis Tutorial',
                          'Predict from String', 'Predict from File']
         option_output = st.sidebar.selectbox('Select Page', input_options)
-        session_id = 0
 
     elif runtime == 'AWS':
         translator_class = LambdaInterface
 
         # Asyncronously ping fan_size instances concurrently
         # to prevent cold start
-        session_id = get_session_id()
-        warmup_lambda(model_description['fan_size'], model_description['function'], seed=session_id)
+        warmup_lambda(model_description['fan_size'], model_description['function'])
         input_options = ['Welcome to Deep Synthesis', 'How it Works',
                          'Deep Synthesis Tutorial', 'Predict from String']
         option_output = st.sidebar.selectbox('Select Page', input_options)
@@ -78,7 +76,7 @@ def app_setup(args):
     # get data params during setup
     single_predict, smile, target = get_data_params(option_output, runtime)
 
-    return model_description, translator_class, single_predict, smile, target, session_id
+    return model_description, translator_class, single_predict, smile, target
 
 def get_data_params(prediction_options, runtime):
     # function determines if prediction will be run on a string input by the user
@@ -143,7 +141,7 @@ def file_selector(folder_path='.', txt='Select a file'):
     return os.path.join(folder_path, selected_filename)
 
 @cache_on_button_press('Load Data')
-def load_data(single_predict, source_param, target_param, session_id=None):
+def load_data(single_predict, source_param, target_param):
     # triggers actually loading the data
     # loaded data is cached
     if single_predict:
@@ -168,10 +166,9 @@ def display_slider(data):
     
     return display_idx
 
-#@st.cache(ignore_hash=True)
 @cache_on_button_press('Predict Products')
 def translate_data(smile_data, beam, n_best, attention, translator_class, 
-                    model_description, session_id=None):
+                    model_description):
     # Important note: translator class must be instantiated within this function for 
     # Streamlit caching to work properly
     placeholder = st.empty()
@@ -188,7 +185,7 @@ def translate_data(smile_data, beam, n_best, attention, translator_class,
     placeholder.text('Prediction Complete')
     return prediction
 
-@st.cache
+@fancy_cache(unique_to_session=True, ttl=3600)
 def plot_topk(prediction_tokens, legend, img_size=(400,400)):
     mols = [Chem.MolFromSmiles(process_prediction(i)) for i in prediction_tokens]
     return Draw.MolsToGridImage(mols, legends=legend, subImgSize=img_size)
