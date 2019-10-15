@@ -23,45 +23,49 @@ mol3 = 'COc1cccc(Nc2nc(Cl)nc3ccccc23)c1OC'
 def rxn_to_image(rxn, img_size=(200,200)):
     return Draw.ReactionToImage(AllChem.ReactionFromSmarts(rxn, useSmiles=True), subImgSize=img_size)
 
+
 def landing_page():
     st.write('Welcome to Deep Synthesis\n')
     st.write('Deep Synthesis is a deep learning tool designed ', 
             'to predict the products of an organic synthesis reaction. ',
             'Deep Synthesis was designed to help chemists explore synthesis in silico ',
             'and rapidly iterate ideas.')
-    st.write('How does deep learning help chemists? Lets look at an example. ', 
-            'What happens to 3-methylcyclopentylchloride ',
-            'when it is exposed to a base?')
-    st.image(rxn_to_image(rx1), use_column_width=True)
-    st.write('For this reaction, the hydroxide would replace the chlorine to form an alcohol.')
-    st.image(rxn_to_image(rx2), use_column_width=True)
-    st.write('This is a fairly straightforward reaction. The SN2 displacement of the chloride ',
-                'is really the only reaction possible.')
-    st.write('But what if your reactant mixture was much more complicated? What if it looked something like this:')
-    st.image(rxn_to_image(rx3, img_size=(150,200)), use_column_width=True)
-    st.write("That's a lot of compounds. There's a lot of ways things could react. What will the ",
-            'major product be?')
-    st.write('Did you guess this?')
-    st.image(rxn_to_image(rx3+rx4, img_size=(150,200)), use_column_width=True)
-    st.write('Organic chemistry quickly becomes extremely complicated. When multiple ',
-             'compounds with multiple functional groups are mixed in a single reaction, ',
-             'the total combinatorial space of possible products explodes. Expert chemists ',
-             'tackle this problem by relying on years of studying reaction rules to help ',
-             'make educated predictions. This is a lot for someone to keep in their head!')
-    st.write('Deep Synthesis makes life easier by helping chemists rapidly iterate ideas in silico. ',
-             'Deep Synthesis uses a state of the art deep learning model to predict likely products ',
-             'from a given set of reactants.')
-    st.image(rxn_to_image(rx5), use_column_width=True)
-    st.image(Draw.MolsToGridImage([Chem.MolFromSmiles(i) for i in rx5_preds], subImgSize=(400,400),
-                                    legends=rx5_labels), use_column_width=True)
+    st.write('For more details, click the box below')
+    if st.checkbox('Click for more info'):
+        st.write('How does deep learning help chemists? Lets look at an example. ', 
+                'What happens to 3-methylcyclopentylchloride ',
+                'when it is exposed to a base?')
+        st.image(rxn_to_image(rx1), use_column_width=True)
+        st.write('For this reaction, the hydroxide would replace the chlorine to form an alcohol.')
+        st.image(rxn_to_image(rx2), use_column_width=True)
+        st.write('This is a fairly straightforward reaction. The SN2 displacement of the chloride ',
+                        'is really the only reaction possible.')
+        st.write('But what if your reactant mixture was much more complicated? What if it looked something like this:')
+        st.image(rxn_to_image(rx3, img_size=(150,200)), use_column_width=True)
+        st.write("That's a lot of compounds. There's a lot of ways things could react. What will the ",
+                'major product be?')
+        st.write('Did you guess this?')
+        st.image(rxn_to_image(rx3+rx4, img_size=(150,200)), use_column_width=True)
+        st.write('Organic chemistry quickly becomes extremely complicated. When multiple ',
+                'compounds with multiple functional groups are mixed in a single reaction, ',
+                'the total combinatorial space of possible products explodes. Expert chemists ',
+                'tackle this problem by relying on years of studying reaction rules to help ',
+                'make educated predictions. This is a lot for someone to keep in their head!')
+        st.write('Deep Synthesis makes life easier by helping chemists rapidly iterate ideas in silico. ',
+                'Deep Synthesis uses a state of the art deep learning model to predict likely products ',
+                'from a given set of reactants.')
+        st.image(rxn_to_image(rx5), use_column_width=True)
+        st.image(Draw.MolsToGridImage([Chem.MolFromSmiles(i) for i in rx5_preds], subImgSize=(400,400), legends=rx5_labels), use_column_width=True)
 
-    st.write('## Why Deep Learning? How does Deep Synthesis work?')
-    st.write('See the "How it Works" tab on the left for an explanation of the methods used')
+        st.write('## Why Deep Learning? How does Deep Synthesis work?')
+        st.write('See the "How it Works" tab on the left for an explanation of the methods used')
+
     st.write('## How do I run predictions?')
     st.write('For a quick tutorial, see the Deep Synthesis Tutorial tab. If ',
                 'you are ready to run predictions, go to the "Predict from String" tab.')
     st.write('## Can I check out the source?')
     st.write('All code is available at the [Deep Synthesis Github Repo](https://github.com/kheyer/Deep-Synthesis)')
+    st.write('')
 
 def smiles_to_image(smiles, img_size=(400,400)):
     mols = [Chem.MolFromSmiles(i) for i in smiles]
