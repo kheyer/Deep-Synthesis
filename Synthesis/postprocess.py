@@ -68,6 +68,7 @@ class Predictions():
         self.df = pd.DataFrame(prediction_data, columns=columns)
             
         self.df['Predictions'] = self.df.Prediction_Tokens.map(lambda x: process_prediction(x))
+        self.df['Scores'] = self.df.Scores.map(lambda x: np.exp(x))
         
     def score_predictions(self):
         # scores predictions if targets are provided

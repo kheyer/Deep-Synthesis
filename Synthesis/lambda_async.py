@@ -115,8 +115,8 @@ def warmup(payload, function):
                              Payload=json.dumps(payload))
     print("warmup completed")
 
-# Within a given session, ping will fire every 30 seconds
-@fancy_cache(unique_to_session=True, ttl=30)
+# Within a given session, ping will fire every 120 seconds
+@fancy_cache(unique_to_session=True, ttl=120)
 def warmup_lambda(fan_size, function, seed=None):
     payload = { 'data': '""',
                 'beam': '',
