@@ -29,11 +29,10 @@ logger.setLevel(logging.INFO)
 
 # Sample smiles for users to predict on
 example_smiles = [
+    '',
     'CCN.Oc1cccc2ccccc12.[Na+].[OH-].c1ccc(OP(Oc2ccccc2)Oc2ccccc2)cc1',
-    'CN(C)C=O.Cn1c(=O)n(CCCI)c2ccccc21.O=C([O-])[O-].O=c1[nH]c2cc(Cl)ccc2n1C1CCNCC1.[Na+].[Na+]',
     'C1CNC1.CS(=O)(=O)OCCC#Cc1ccc2c(-c3ccc(Br)cc3)nsc2c1.O=C([O-])[O-].[Na+].[Na+]',
     'CCN(CC)CC.CO.COC(=O)c1sc(Cl)c(Cl)c1NC(C)=O.[H][H]',
-    'C1CCOC1.CCC(C)(C)Cc1cn(S(=O)(=O)N(C)C)c(C(=O)Cc2ccc(Br)cc2)n1.C[Mg+].[Br-].[Ce+3].[Cl-].[Cl-].[Cl-]',
     'CC1CO1.CCCBr.CCCCCC.CCN(CC)CC.CN(C)P(=O)(N(C)C)N(C)C.COc1cc([N+](=O)[O-])c2ncccc2c1O.O',
     'C1CCOC1.CCOC(=O)CCCCCOc1c(C=CC(=O)CCc2ccccc2)occc1=O.CC[BH-](CC)CC.[Li+]',
     'C#Cc1ccccc1.CCN(CC)CC.CCN(CC)CCOc1cc(Cl)c(I)cc1Cl.[Cu]I.[Pd]',
@@ -51,12 +50,14 @@ def app_setup(args):
     runtime = args.runtime 
     model_description = json.load(open(config_json_opts[runtime]))
 
+    input_options = ['Welcome to Deep Synthesis', 'How it Works', 
+                        'Prediction Tutorial']
+
     # Define class to handle translations based on runtime
     if runtime == 'local':
         translator_class = TranslationModel
 
-        input_options = ['Welcome to Deep Synthesis', 'How it Works', 'Deep Synthesis Tutorial',
-                         'Predict from String', 'Predict from File']
+        input_options += ['Predict from String', 'Predict from File']
         option_output = st.sidebar.selectbox('Select Page', input_options)
 
     elif runtime == 'AWS':
@@ -65,15 +66,14 @@ def app_setup(args):
         # Asyncronously ping fan_size instances concurrently
         # to prevent cold start
         warmup_lambda(model_description['fan_size'], model_description['function'])
-        input_options = ['Welcome to Deep Synthesis', 'How it Works',
-                         'Deep Synthesis Tutorial', 'Predict from String']
+        input_options += ['Run Prediction']
         option_output = st.sidebar.selectbox('Select Page', input_options)
         
     else:
         raise ValueError('''Please provide a valid runtime argument. Use 'local' to run predictions locally, or 
                     'AWS' to run predictions on AWS (AWS inference requires permissions)''')
-
-    # get data params during setup
+        
+    # get data during setup
     single_predict, smile, target = get_data_params(option_output, runtime)
 
     return model_description, translator_class, single_predict, smile, target
@@ -81,22 +81,28 @@ def app_setup(args):
 def get_data_params(prediction_options, runtime):
     # function determines if prediction will be run on a string input by the user
     # or from a file of SMILES strings
+
     if prediction_options == 'Welcome to Deep Synthesis':
         landing_page()
 
-        return None, None, None
+        st.write("### I know what I'm doing, I'm ready to run predictions now")
+        st.write('Click the check box below to enable predictions on this page.')
+        if st.checkbox('Run Predictions Now'):
+            return get_data_params('Run Prediction', runtime)
+        else:
+            return None, None, None 
 
     elif prediction_options == 'How it Works':
         explanation_page()
 
         return None, None, None
 
-    elif prediction_options == 'Deep Synthesis Tutorial':
+    elif prediction_options == 'Prediction Tutorial':
         tutorial_page(runtime)
 
         return None, None, None
 
-    elif prediction_options == 'Predict from String':
+    elif prediction_options == 'Predict from String' or prediction_options == 'Run Prediction':
         single_predict = True
         # If single predict, create a text box for user input
         # seed UI with sample reaction
@@ -188,38 +194,57 @@ def translate_data(smile_data, beam, n_best, attention, translator_class,
 @fancy_cache(unique_to_session=True, ttl=3600)
 def plot_topk(prediction_tokens, legend, img_size=(400,400)):
     mols = [Chem.MolFromSmiles(process_prediction(i)) for i in prediction_tokens]
-    return Draw.MolsToGridImage(mols, legends=legend, subImgSize=img_size)
+    if len(mols) <= 3:
+        molsperrow = len(mols)
+    else:
+        molsperrow = 3
+    return Draw.MolsToGridImage(mols, legends=legend, subImgSize=img_size, molsPerRow=molsperrow)
+
+
+def prediction_details(pred):
+    st.image(plot_topk([pred.prediction_tokens], None, img_size=(320,320)), caption=pred.legend, width=320)
+
+    #if st.checkbox(f'View Details for {pred.legend}'):
+    im, attn_plot = plot_prediction(pred.source_tokens,
+                                pred.prediction_tokens,
+                                pred.attention,
+                                pred.legend,
+                                img_size=(200,400))
+
+    if im:
+        st.write('Full predicted reaction')
+        st.image(im, use_column_width=True)
+    st.write(f'Predicted SMILE: {process_prediction(pred.prediction_tokens)}')
+    full_rxn = process_prediction(pred.source_tokens) + '>>' + process_prediction(pred.prediction_tokens)
+    st.write(f'Full Predicted Reaction SMILE: {full_rxn}')
+    st.write('')
+    if st.checkbox('What is this plot?'):
+        st.write('This is an attention plot extracted from the model. Attention plots show how each element in the source sequence ',
+                 'relates to each element in the target sequence.')
+        st.write('This plot is designed to be read by rows. For each token on the ',
+                 'Y axis, the row associated with that token shows how elements of the source sequence relate to that token')
+    st.write('Prediction attention plot')
+    st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
+
 
 def display_prediction(prediction, display_idx):
     prediction_data = display_parameters(prediction, idx=display_idx)
 
     st.write(f'Top {prediction.top_k} Predictions')
-    st.image(plot_topk([i.prediction_tokens for i in prediction_data],
-                        [i.legend for i in prediction_data], img_size=(400,400)), use_column_width=True)
 
-    if len(prediction_data) > 1:
-        view_idx = st.slider('View Prediction (In Order of Model Confidence)', 0, len(prediction_data)-1, 0)
-    else:
-        view_idx = 0
+    images = [plot_topk([i.prediction_tokens], legend=None, img_size=(210,210)) for i in prediction_data]
+    legends = [i.legend for i in prediction_data]
+    st.image(images, caption=legends, width=210)
 
-    current_prediction = prediction_data[view_idx]
-    im, attn_plot = plot_prediction(current_prediction.source_tokens,
-                                    current_prediction.prediction_tokens,
-                                    current_prediction.attention,
-                                    current_prediction.legend,
-                                    img_size=(200,400))
+    st.write('Use the drop down menu to view each prediction in detail')
 
-    st.write(current_prediction.legend)
-    if im:
-        st.image(im, use_column_width=True)
-    st.write(f'Predicted Smile: {process_prediction(current_prediction.prediction_tokens)}')
-    full_rxn = process_prediction(current_prediction.source_tokens) + '>>' + process_prediction(current_prediction.prediction_tokens)
-    st.write(f'Full Predicted Reaction: {full_rxn}')
-    st.write('')
-    st.pyplot(plt.show(attn_plot), bbox_inches = 'tight', pad_inches = 0)
+    pred_list = [f'Prediction {i}' for i in range(1, len(prediction_data)+1)]
+    idx = int(st.selectbox('Select Prediction', pred_list).split(' ')[1])
+
+    prediction_details(prediction_data[idx-1])
 
     st.write('\nPrediction Dataframe')
-    st.dataframe(prediction.sample_df(display_idx))
+    st.dataframe(prediction.sample_df(display_idx)[['Predictions', 'Scores']], width=500)
 
 @cache_on_button_press('Save Prediction Data')
 def save_data(predictions, save_folder):
