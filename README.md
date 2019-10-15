@@ -10,7 +10,7 @@ There are a number of ways to use Deep Synthesis. Choose the one that best fits 
 
 ### Online Web App
 
-Deep Synthesis is running online at [deepsynthesis.xyz](deepsynthesis.xyz). Using the web app is great if you want to play with the model or run a small number of predictions.
+Deep Synthesis is running online at [deepsynthesis.xyz](http://deepsynthesis.xyz/). Using the web app is great if you want to play with the model or run a small number of predictions.
 
 Input your SMILES string into the text box, or choose one of the examples in the drop down menu on the left. Clicking the "Predict Products" button generates a set of predicted reaction products.
 
@@ -31,7 +31,7 @@ For instructions on how to set up locally, see the README of the `build_local` d
 
 ### Running on AWS
 
-For scalable deployments, we can set up a Kubernetes cluster on AWS to host the front end of the application and a AWS Lambda function to handle inference. If you want to replicate the setup used to host the application on [deepsynthesis.xyz](deepsynthesis.xyz), see the README of the `build_aws` directory. [link](https://github.com/kheyer/Deep-Synthesis/tree/master/build_aws)
+For scalable deployments, we can set up a Kubernetes cluster on AWS to host the front end of the application and a AWS Lambda function to handle inference. If you want to replicate the setup used to host the application on [deepsynthesis.xyz](http://deepsynthesis.xyz/), see the README of the `build_aws` directory. [link](https://github.com/kheyer/Deep-Synthesis/tree/master/build_aws)
 
 Note that AWS setup is much more involved than local setup, and requires an AWS IAM account with permissions for EKS, EC2 and Lambda.
 
