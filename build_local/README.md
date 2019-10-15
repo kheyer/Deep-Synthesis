@@ -69,13 +69,13 @@ Optionally, a file of target SMILES can be provided if known products to the rea
 
 Load data using the button. For bulk predictions, there will now be a slider on the sidebar that lets you scroll through your data.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction3.png" width="500" alt="local prediction from string">
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/master/media/prediction3.png" width="500" alt="local prediction from string">
 
 Bulk prediction mode allows you to specify the beam width and top-k results from the prediction. Once your prediction parameters are set, run predictions.
 
 Bulk prediction mode also supports saving prediction data to a csv file based on the path inputted to the dialogue box at the bottom of the app page.
 
-<img src="https://github.com/kheyer/Deep-Synthesis/blob/training/media/prediction4.png" width="500" alt="local prediction from string">
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/master/media/prediction4.png" width="500" alt="local prediction from string">
 
 
 ### Command Line Inference
@@ -100,4 +100,4 @@ Note: if you built Deep Synthesis inside a docker container, you should exec int
 
 ## Training Locally
 
-If training sequence to sequence models is your thing, you can retrain the final model using the scripts in the `/train` directory. See the README in the [train directory](https://github.com/kheyer/Deep-Synthesis/tree/training/train) for full instructions.
+If training sequence to sequence models is your thing, you can retrain the final model using the scripts in the `/train` directory. See the README in the [train directory](https://github.com/kheyer/Deep-Synthesis/tree/master/train) for full instructions.
