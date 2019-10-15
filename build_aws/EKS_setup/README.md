@@ -124,6 +124,27 @@ To configure cluster autoscaling, go to the `Auto Scaling Groups` section of the
 
 Edit these numbers to match your expected needs. Note that creating a new node creates a new EC2 instance, which incurs charges.
 
+### Kubernetes Dashboard
+
+A useful service for monitoring the cluster is the Kubernetes dashboard. We set up the dashboard with the following commands.
+
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+    kubectl apply -f eks-admin-service-account.yaml
+
+Now you have an admin account for the Kubernetes Dashboard. To generate a login token, run:
+
+    kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
+
+Save the token from the output. To start the metrics server, run:
+
+    kubectl proxy --port=[port]
+
+The dashboard is now running at 
+
+    http://localhost:[port]/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login
+
+Note that the `localhost` of the above link is relative to the instance you are running the dashboard on. To actually access the dashboard on your local machine, port forwarding is required. Going to the dashboard link will prompt you for a token login. Paste the token from before. s
+
 ### Load Balancer
 
 When we applied the Kubernetes config, we also created a load balancer to handle ingress into the cluster. Now that everything is set up, we can use the load balancer to access the application. Go to the Load Balancer section of the EC2 console and locate the load balancer created during EKS setup. Under the "Description" tab, there is a section for the DNS Name of the load balancer. This link can be used to access the application.
