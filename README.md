@@ -6,6 +6,30 @@ Deep Synthesis allows chemists and chemistry enthusiasts to experiment with reac
 
 Deep Synthesis is running online at [deepsynthesis.xyz](http://deepsynthesis.xyz/).
 
+# Repository Structure
+
+    Deep-Synthesis
+    ├── Synthesis
+    │   └── Main program files
+    ├── build_aws
+    │   └── Instructions for AWS setup
+    ├── build_local
+    │   └── Instructions for local setup
+    ├── configs
+    ├── data
+    │   └── Small sample datasets
+    ├── media
+    ├── train
+    │   └── Code for retraining the model
+
+Main application files are stored in the `Synthesis` directory
+
+Code and instructions for setup on AWS are contained in the `build_aws` directory
+
+Code and instructions for local setup are contained in the `build_local` directory
+
+Code for retraining the model (assuming a local install) is contained in the `train` directory
+
 ## How to Install
 
 The Deep Synthesis repo supports local installation and setup on AWS.
@@ -16,7 +40,7 @@ Deep Synthesis can easily be set up on your local machine, either as a Docker co
 
 Local setup supports bulk prediction from a text file of SMILES string, either through the app GUI or a command line interface.
 
-The quickest way to get up and running is to install Deep Synthesis using Docker. If you do not have Docker, follow the [Docker Download Instructions](https://docs.docker.com/install/). Then run the following commands:
+The quickest way to get up and running is to install Deep Synthesis using Docker. If you do not have Docker installed, follow the [Docker Download Instructions](https://docs.docker.com/install/). Then run the following commands:
 
     git clone https://github.com/kheyer/Deep-Synthesis
     cd Deep-Synthesis
@@ -31,7 +55,7 @@ For additional local installation instructions, see the README of the `build_loc
 
 For a more scalable setup, Deep Synthesis can be run on AWS. We can set up a Kubernetes cluster on AWS to host the front end of the application and a AWS Lambda function to handle inference.
 
-** image placeholder **
+<img src="https://github.com/kheyer/Deep-Synthesis/blob/readme_updates/media/aws_setup.png" width="600" alt="AWS setup">
 
 This is the framework being used to host the application at [deepsynthesis.xyz](http://deepsynthesis.xyz/). For full details on setting up Kubernetes and AWS Lambda, see the `build_aws` directory. [link](https://github.com/kheyer/Deep-Synthesis/tree/master/build_aws)
 
@@ -49,6 +73,12 @@ Input your SMILES string into the text box, or choose one of the examples in the
 Predictions can be further inspected by looking at attention maps between reactant and predicted product strings.
 
 <img src="https://github.com/kheyer/Deep-Synthesis/blob/master/media/prediction2.png" width="500" alt="prediction from string">
+
+## Model Details
+
+The model used is a sequence to sequence transformer model, implemented in [OpenNMT](https://github.com/kheyer/OpenNMT-py). This model takes as input the SMILES string representation of reactants, and "translates" them to the SMILES of the product molecule. This method was originally developed by [Schwaller et al](https://arxiv.org/abs/1811.02633). Their work is available at the [Molecular Transformer Repo](https://github.com/pschwllr/MolecularTransformer).
+
+Compared to Schwaller, the model shown here was trained from scratch in Pytorch 1.1.0 using the expanded [Patent Reaction Dataset](https://depth-first.com/articles/2019/01/28/the-nextmove-patent-reaction-dataset/). The new model also uses character level tokenization, which reduces model size and removes the need for the chemically constrained beam search procedure used by Schwaller.
 
 ### Project Slides
 

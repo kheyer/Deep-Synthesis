@@ -9,6 +9,12 @@ To follow the repo instructions for setting up this deployment, you should have 
  * You have configured the [AWS IAM authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
  * You have set up [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
+  This is the overall architecture that we are going to creeate:
+
+ <img src="https://github.com/kheyer/Deep-Synthesis/blob/readme_updates/media/aws_setup.png" width="600" alt="AWS setup">
+
+ The Streamlit front end for the application will be running on an EKS cluster with a load balancer to manage incoming traffic. Inference will be run on an AWS Lambda function.
+
 The reason for choosing this deployment framework is to create a service with maximal scalability for minimal cost. AWS Lambda is only changed per time used, which makes it the cheapest option for applications running a low number of predictions. EKS creates a scalable deployment for the front end that uses minimal resources during idle periods, but can easily scale to demand. More details on price and deployment considerations are listed in the bottom section.
 
 ## Front End Deployment on EKS
