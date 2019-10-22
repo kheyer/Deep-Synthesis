@@ -1,0 +1,50 @@
+# Model configuration file for OpenNMT
+# Based on work by Schwaller et al
+# https://arxiv.org/abs/1811.02633
+# https://github.com/pschwllr/MolecularTransformer
+
+data: data/molecular_data/molecular_transformer_data
+save_model: experiments/checkpoints/molecular_data/molecular_transformer
+save_checkpoint_steps: 10000
+seed: 42
+train_steps: 500000
+valid_steps: 5000
+warmup_steps: 8000
+report_every: 100
+log_file: data/molecular_data/train_log.txt
+
+decoder_type: transformer
+encoder_type: transformer
+word_vec_size: 256
+rnn_size: 256
+layers: 4
+transformer_ff: 2048
+heads: 8
+
+accum_count: 4
+optim: adam
+adam_beta1: 0.9
+adam_beta2: 0.998
+decay_method: noam
+learning_rate: 2.0
+max_grad_norm: 0.0
+
+batch_size: 11000
+batch_type: tokens
+normalization: tokens
+dropout: 0.1
+label_smoothing: 0.0
+
+max_generator_batches: 32
+
+param_init: 0.0
+param_init_glorot: 'true'
+position_encoding: 'true'
+share_embeddings: 'true'
+
+global_attention: general
+global_attention_function: softmax
+self_attn_type: scaled-dot
+
+gpu_ranks:
+- 0
