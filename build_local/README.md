@@ -4,9 +4,25 @@ The following instructions detail how to set up Deep Synthesis on your local env
 
 Local inference will run on either GPU or CPU depending on what is available on the local environment. If Pytorch detects a CUDA enabled device, inference will default to GPU.
 
+## Creating a Local Docker Container
+
+Deep Synthesis can be run in a Docker container. If you do not have Docker installed, follow the [Docker Download Instructions](https://docs.docker.com/install/). Then run the following:
+
+Clone the repository
+
+    git clone https://github.com/kheyer/Deep-Synthesis
+    
+Build the container
+
+    cd Deep-Synthesis
+    docker build -f build_local/local.Dockerfile -t deep_synthesis .
+    docker run -d -p 8501:8501 deep_synthesis
+
+The Streamlit app is now running locally on port 8501
+
 ## Creating a Local Conda Environment
 
-The following instructions show how to set up Deep Synthesis as a Conda environment on your local machine.
+The following instructions show how to set up Deep Synthesis as a Conda environment on your local machine. Note that these instructions assume you already have Conda installed. If you don't have Conda installed, follow the [Conda Download Instructions](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
 
 Clone the repository
 
@@ -24,23 +40,6 @@ Once package installation is complete, activate the new conda environment and st
 
     source activate deep_synthesis
     streamlit run Synthesis/app.py local
-
-The Streamlit app is now running locally on port 8501
-
-
-## Creating a Local Docker Container
-
-Deep Synthesis can also be built as a Docker container
-
-Clone the repository
-
-    git clone https://github.com/kheyer/Deep-Synthesis
-    
-Build the container
-
-    cd Deep-Synthesis
-    docker build -f build_local/local.Dockerfile -t deep_synthesis .
-    docker run -d -p 8501:8501 deep_synthesis
 
 The Streamlit app is now running locally on port 8501
 
