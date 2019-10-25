@@ -20,7 +20,7 @@ Deep Synthesis is running online at [deepsynthesis.xyz](http://deepsynthesis.xyz
     │   └── Small sample datasets
     ├── media
     ├── train
-    │   └── Code for retraining the model
+        └── Code for retraining the model
 
 Main application files are stored in the `Synthesis` directory
 
