@@ -143,7 +143,7 @@ The dashboard is now running at
 
     http://localhost:[port]/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login
 
-Note that the `localhost` of the above link is relative to the instance you are running the dashboard on. To actually access the dashboard on your local machine, port forwarding is required. Going to the dashboard link will prompt you for a token login. Paste the token from before. s
+Note that the `localhost` of the above link is relative to the instance you are running the dashboard on. To actually access the dashboard on your local machine, port forwarding is required. Going to the dashboard link will prompt you for a token login. Paste the token from before.
 
 ### Load Balancer
 
