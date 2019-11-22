@@ -132,7 +132,7 @@ def get_filenames(path='data'):
 
     if st.checkbox('Target File?'):
         # optional check box for a file of targets (not required)
-        target_folder = st.text_input('Data Folder Path', folder)
+        target_folder = st.text_input('Data Folder Path', folder, key=np.random.randn())
         target_filename = file_selector(folder_path=target_folder, txt='Select target file')
     else:
         target_filename = None

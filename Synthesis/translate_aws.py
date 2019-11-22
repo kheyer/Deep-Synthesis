@@ -36,7 +36,6 @@ class LambdaInterface():
     def __init__(self, config):
         self.function = config['function']
         self.bucket = config['bucket']
-        self.s3 = boto3.client('s3')
         self.fan_size = config['fan_size']
         self.chunksize_dict = {
                                 1 : 100,
@@ -121,14 +120,14 @@ class LambdaInterface():
         payload_size = min(self.chunksize_dict[beam], math.ceil(len(data)/fan_size))
 
         # break data into chunks of size payload_size
-        chunked_data = self.chunk_data(data, payload_size) #self.chunk_data(self.data, self.payload_size)
+        chunked_data = self.chunk_data(data, payload_size)
 
         # process payload chunks into json format
         payload_chunks = self.data_to_payload(chunked_data, beam, n_best, return_attention)
 
         # break payloads into invocation chunks
         # each chunk contains fan_size payload chunks
-        invocation_chunks = self.chunk_data(payload_chunks, fan_size) #self.chunk_data(payload_chunks, self.fan_size)
+        invocation_chunks = self.chunk_data(payload_chunks, fan_size)
         
         results = []
         # async prediction on each invocation chunk

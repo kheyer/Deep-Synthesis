@@ -126,5 +126,5 @@ def warmup_lambda(fan_size, function, seed=None):
     for i in range(fan_size):
         print('starting warmup')
         warmup(payload, function)
-        time.sleep(0.1)
+        time.sleep(0.05)
     return 'warmup complete'

@@ -40,7 +40,7 @@ def cache_on_button_press(label, show_spinner=True):
     def function_decorator(func):
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs):
-            @fancy_cache(ignore_hash=True, show_spinner=show_spinner,
+            @fancy_cache(allow_output_mutation=True, show_spinner=show_spinner,
                          unique_to_session=True, ttl=3600)
             def get_cache_entry(func, args, kwargs):
                 class ButtonCacheEntry:
