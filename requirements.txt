@@ -9,7 +9,7 @@ future
 configargparse
 boto3
 pathlib
-streamlit
+streamlit==0.50.2
 pandas
 numpy
 seaborn
